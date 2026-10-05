@@ -1,7 +1,7 @@
 ---
 scope_type: phase
 related_phases: [3]
-status: pending
+status: decided
 date: 2026-10-05
 scope_description: "Backend foundation for video upload and processing: object storage usage, background job queue, resumable 10GB upload, draft pre-registration, worker with FFmpeg (metadata + thumbnail), unique short video URLs, streaming and download delivery, and status lifecycle with failure handling."
 ---
@@ -11,7 +11,7 @@ scope_description: "Backend foundation for video upload and processing: object s
 _Subprojects in scope:_
 
 - `nestjs-project/` — backend that delivers the upload API (initiate / sign parts / complete / abort), the draft `videos` entity and migration, the queue producer, the video worker (separate container from the same codebase, see TD-04), streaming/download endpoints, and the new Compose infrastructure (object storage + queue broker).
-- `next-frontend/` — Frontend deferred: the video upload and playback UI is out of scope for this phase (the player arrives in Fase 05). No open decision in this document. Backend contracts that a future client will consume (upload protocol, URL id format, streaming URLs) are decided here as Backend TDs because no frontend code exists yet to be co-designed.
+- `next-frontend/` — No open decision in this document: none of the Phase 03 capability bullets is a screen (the upload/playback UI is out of scope for this backend phase; the player arrives in Fase 05). Backend contracts a future frontend slice will consume (upload protocol, URL id format, streaming URLs) are decided here as Backend TDs and exposed through the existing `openapi.json` → BFF pipeline inherited from `openapi-docs-nestjs` and `next-frontend-openapi-typing`.
 
 ---
 
@@ -42,7 +42,8 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (BullMQ + Redis)** — it is the project's documented best practice, gives retries/backoff/idempotent job ids out of the box (needed by TD-09), and the Redis container cost is small compared to hand-building job semantics; pin `@nestjs/bullmq@^11` for Nest 11 / CommonJS.
 
-**Decision:** _[pending]_
+**Decision:** A (BullMQ + Redis)
+**Libraries:** @nestjs/bullmq, bullmq
 
 ---
 
@@ -73,7 +74,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (presigned multipart, direct to storage)** — it is the only option that both removes video bytes from the API and gives native per-part resume, matching the C4 design and the plan's "sem impacto na performance" requirement; the size cap is enforced at initiate and re-checked at complete.
 
-**Decision:** _[pending]_
+**Decision:** A (Presigned S3 multipart upload, direct to storage)
 
 ---
 
@@ -99,7 +100,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (API-driven complete)** — with presigned multipart the API must call `CompleteMultipartUpload` anyway, so it is the natural place to validate, flip the status and enqueue idempotently; it keeps local (MinIO) and production (S3) behavior identical.
 
-**Decision:** _[pending]_
+**Decision:** A (API-driven initiate/complete)
 
 ---
 
@@ -130,7 +131,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (same codebase, separate entrypoint + `video-worker` service)** — it honours the C4 container boundary and isolates FFmpeg load, while avoiding duplicated domain code; `ffmpeg` is installed in the shared dev image so integration tests run against the real binary.
 
-**Decision:** _[pending]_
+**Decision:** A (Same NestJS codebase, separate worker entrypoint and Compose service)
 
 ---
 
@@ -161,7 +162,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (spawn system ffprobe/ffmpeg on a presigned URL)** — `fluent-ffmpeg` is archived and `ffmpeg-static` breaks under `--ignore-scripts`; streaming input avoids 10GB temp copies. Thumbnail frame policy: seek to ~10% of the duration (fallback to the first frame for very short videos).
 
-**Decision:** _[pending]_
+**Decision:** A (Spawn system ffprobe/ffmpeg on a presigned GET URL)
 
 ---
 
@@ -192,7 +193,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option B (random base64url `public_id`)** — satisfies "short", "never conflicts" (unique index + retry) and the future unlisted requirement (non-guessable), with no new dependency.
 
-**Decision:** _[pending]_
+**Decision:** B (Random base64url public_id with unique constraint)
 
 ---
 
@@ -223,7 +224,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (presigned GET + Range/206 from storage)** — it follows the C4 "frontend streams from storage" relation and keeps the API out of the byte path; the public-endpoint signing config is a one-time setting. HLS is deferred.
 
-**Decision:** _[pending]_
+**Decision:** A (Presigned GET URLs with Range support)
 
 ---
 
@@ -254,7 +255,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (processing-only status, Postgres enum)** — it keeps the "rascunho → publicação" flow for Fase 04 as an orthogonal field and stays consistent with the existing enum convention (`verification_tokens_type_enum`); Option B is the fallback if the migration-test reentrancy issue is not fixed first.
 
-**Decision:** _[pending]_
+**Decision:** A (Processing status as Postgres enum)
 
 ---
 
@@ -283,7 +284,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (bounded retries + `failed` with reason)** — it covers transient failures with queue-native features and guarantees a terminal state; the reprocess endpoint is a later, additive feature.
 
-**Decision:** _[pending]_
+**Decision:** A (Bounded retries with exponential backoff, then failed)
 
 ---
 
@@ -309,7 +310,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (owner-only, centralized policy)** — drafts must not leak before publication exists, and a single policy method lets Fase 04/05 open access without changing route contracts.
 
-**Decision:** _[pending]_
+**Decision:** A (Owner-only with centralized access policy)
 
 ---
 
@@ -338,7 +339,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option B (two buckets keyed by video id)** — separates private originals from thumbnails that later phases will likely serve publicly, at the small cost of provisioning one more bucket.
 
-**Decision:** _[pending]_
+**Decision:** B (Two buckets keyed by videoId)
 
 ---
 
@@ -364,7 +365,8 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (AWS SDK v3)** — the S3 API is the stable contract between local MinIO and production storage; checksum and path-style settings are one-time client configuration.
 
-**Decision:** _[pending]_
+**Decision:** A (AWS SDK for JavaScript v3)
+**Libraries:** @aws-sdk/client-s3, @aws-sdk/s3-request-presigner
 
 ---
 
@@ -394,7 +396,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (Chainguard MinIO pinned by digest)** — keeps MinIO as documented while restoring a maintained, reproducible image source; bucket creation is done by the application/test setup through the S3 API, so `mc` is not required.
 
-**Decision:** _[pending]_
+**Decision:** A (Chainguard MinIO image pinned by digest)
 
 ---
 
@@ -419,7 +421,7 @@ _Subprojects in scope:_
 
 **Recommendation:** **Option A (real MinIO + Redis in tests)** — the critical Phase 03 behaviors are protocol-level and only real infrastructure verifies them; the `StorageService` abstraction is still kept so unit tests can mock it.
 
-**Decision:** _[pending]_
+**Decision:** A (Real MinIO + Redis for integration/e2e)
 
 ---
 
