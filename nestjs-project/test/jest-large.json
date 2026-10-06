@@ -1,0 +1,11 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": "\\.large-spec\\.ts$",
+  "testTimeout": 3600000,
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "setupFiles": ["dotenv/config"]
+}

@@ -284,7 +284,7 @@ _Auto-split rationale: original SI would have 7 test files; split per "artifact 
 _Auto-split rationale: original SI would have 7 test files; split per "artifact type" (domain services + policy / upload endpoint wiring)._
 
 **Route:** POST /videos
-**Test Specs:** _pending /plan-test-specs_
+**Test Specs:** see `nestjs-project/specs/videos-initiate-upload.plan.md`
 **Authorization:** Authenticated — o vídeo é criado no canal do chamador (`### Authorization Matrix`)
 
 **Description:** Expõe o initiate do TD-03: pré-cadastra o rascunho e abre o multipart upload no storage numa única chamada. Devolve ao cliente tudo o que ele precisa para enviar as partes direto ao storage, sem que os bytes passem pela API (AMB-3).
@@ -347,7 +347,7 @@ _Auto-split rationale: original SI would have 7 test files; split per "artifact 
 **Route:** POST /videos/:publicId/upload/part-urls
 **Route:** GET /videos/:publicId/upload/parts
 **Route:** DELETE /videos/:publicId/upload
-**Test Specs:** _pending /plan-test-specs_
+**Test Specs:** see `nestjs-project/specs/videos-upload-session.plan.md`
 **Authorization:** Owner only — não dono recebe `404 VIDEO_NOT_FOUND` (`### Authorization Matrix`)
 
 **Description:** Completa o ciclo de upload resumível do TD-02: o cliente pede URLs presignadas em lotes, descobre quais partes já subiram para retomar o envio e pode cancelar. O cancelamento usa a ordem anti-corrida definida em `### API Contracts → DELETE /videos/:publicId/upload`.
@@ -398,7 +398,7 @@ _Auto-split rationale: original SI would have 7 test files; split per "artifact 
 ### SI-03.7 — Endpoint POST /videos/:publicId/upload/complete: concluir upload e enfileirar processamento
 
 **Route:** POST /videos/:publicId/upload/complete
-**Test Specs:** _pending /plan-test-specs_
+**Test Specs:** see `nestjs-project/specs/videos-upload-complete.plan.md`
 **Authorization:** Owner only — não dono recebe `404 VIDEO_NOT_FOUND` (`### Authorization Matrix`)
 
 **Description:** Fecha o multipart no storage e reconfere o tamanho real (AMB-3). Depois move o vídeo para `processing` e publica `process-video` (TD-03). É idempotente sob retry do cliente e seguro contra complete/cancel concorrentes, conforme `### API Contracts → POST /videos/:publicId/upload/complete → Behavior`.
@@ -603,7 +603,7 @@ _Auto-split rationale: original SI would have 8 Technical actions; split per "in
 ### SI-03.10 — Endpoint GET /videos/:publicId: leitura do dono com status, metadados e thumbnail
 
 **Route:** GET /videos/:publicId
-**Test Specs:** _pending /plan-test-specs_
+**Test Specs:** see `nestjs-project/specs/videos-get.plan.md`
 **Authorization:** Owner only — não dono recebe `404 VIDEO_NOT_FOUND` (`### Authorization Matrix`)
 
 **Description:** Dá ao dono a visão do vídeo durante e depois do processamento: status para polling, metadados persistidos (AMB-2) e o thumbnail como URL presignada de curta duração (AMB-8). É o ponto onde o resultado do worker se torna observável pela API.
@@ -641,7 +641,7 @@ _Auto-split rationale: original SI would have 8 Technical actions; split per "in
 
 **Route:** GET /videos/:publicId/stream
 **Route:** GET /videos/:publicId/download
-**Test Specs:** _pending /plan-test-specs_
+**Test Specs:** see `nestjs-project/specs/videos-playback.plan.md`
 **Authorization:** Owner only — não dono recebe `404 VIDEO_NOT_FOUND`. Vídeo não `ready` recebe `409 VIDEO_NOT_READY` (`### Authorization Matrix`).
 
 **Description:** Fecha a capacidade de reprodução da fase. O dono recebe URLs presignadas e o navegador busca os bytes direto do storage: streaming com HTTP Range e download com `Content-Disposition: attachment` (TD-07). A API nunca trafega o conteúdo do vídeo.

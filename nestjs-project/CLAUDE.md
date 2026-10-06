@@ -13,6 +13,7 @@ docker compose ps   # all services must show status "running"
 Then verify each infrastructure service is actually ready to accept connections — not just running:
 
 - **PostgreSQL:** `docker compose exec db pg_isready -U streamtube` — expect `accepting connections`
+- **Redis / MinIO:** `docker compose ps redis minio` — both must show `healthy` (each has a Compose healthcheck)
 
 Only start the NestJS dev server (`npm run start:dev`) when the user **explicitly** asks to run the application — never as part of "start the environment".
 
@@ -34,6 +35,13 @@ docker compose exec nestjs-api npm run start:dev
 Services:
 - `nestjs-api` — NestJS API, port `3000`
 - `db` — PostgreSQL 17, port `5432`, database `streamtube`, user/password `streamtube`
+- `redis` — Redis 8.4 (BullMQ queue backend), port `6379`, `maxmemory-policy noeviction`
+- `minio` — MinIO (S3-compatible object storage), API port `9000`, console port `9001`
+- `video-worker` — same image as `nestjs-api` (with `ffmpeg`/`ffprobe`); consumes the `video-processing` queue. Idle by default, like `nestjs-api`; start it with `docker compose exec video-worker npm run start:worker`. The worker has no watch mode (`nest start --watch` would wipe the API's `dist/` via `deleteOutDir`), so **restart it after every code change**. Compiled build: `npm run build`, then `npm run start:worker:prod` (`node dist/worker`). It opens no HTTP port and exits with code 0 on `SIGTERM` after closing the queue workers and the DB connection.
+
+**Storage endpoints — documented exception to the service-name rule (AMB-7):** `S3_ENDPOINT=http://minio:9000` is used for all service-to-service traffic. `S3_PUBLIC_ENDPOINT=http://localhost:9000` is the host the **browser** sees, used only to sign presigned URLs returned to clients; that is why it is `localhost`. Never use `S3_PUBLIC_ENDPOINT` for traffic between containers.
+
+**Test precondition:** integration and e2e suites use real storage and queue — `redis` and `minio` must be `healthy` before running tests.
 
 All verification and teardown commands run on the **host machine**:
 
