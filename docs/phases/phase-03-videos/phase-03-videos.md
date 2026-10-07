@@ -787,6 +787,8 @@ Table `videos` (new — SI-03.4). Ownership rule: AMB-6. Status lifecycle: `phas
 | mime_type | varchar(100) | not null — the declared type, one of the AMB-5 allowlist values |
 | size_bytes | bigint | not null — the declared size at initiate, overwritten by the real `HeadObject.ContentLength` at complete (AMB-3). Uses a `{ to: v => v, from: v => v === null ? null : Number(v) }` transformer so the entity exposes `number` (values ≤ 10 GiB are safe integers). |
 | upload_id | varchar(1024) | nullable — the S3 multipart `UploadId`. Set at initiate. Set to `null` once complete succeeds, and never read again after that. |
+| original_key | varchar(255) | not null — storage key of the original in `storage.videosBucket`, `videoOriginalKey(id)` = `{id}/original`. Set on creation (the service generates the uuid before the insert) and never changed (TD-11; added by `AddVideoStorageKeys`). |
+| thumbnail_key | varchar(255) | nullable — storage key of the thumbnail in `storage.thumbnailsBucket`, `videoThumbnailKey(id)` = `{id}/thumbnail.jpg`. Set by the `processing → ready` transition, `null` in every other status (TD-11; added by `AddVideoStorageKeys`). |
 | duration_seconds | double precision | nullable — ffprobe `format.duration` (AMB-2) |
 | width | integer | nullable — first video stream `width` (AMB-2) |
 | height | integer | nullable — first video stream `height` (AMB-2) |
@@ -799,11 +801,11 @@ Table `videos` (new — SI-03.4). Ownership rule: AMB-6. Status lifecycle: `phas
 
 **Relations:** `Video` many-to-one `Channel` (`@ManyToOne(() => Channel, (channel) => channel.videos)` + `@JoinColumn({ name: 'channel_id' })`). `Channel` gets the inverse `@OneToMany(() => Video, (video) => video.channel) videos: Video[]` with no schema change (entity rule: always define both sides).
 **Indexes:** unique on `public_id`; non-unique on `channel_id` (owner lookups now, channel listing in Fase 04).
-**Derived, not stored (TD-11):**
-- the original object is in bucket `storage.videosBucket`, key `{id}/original`;
-- the thumbnail is in bucket `storage.thumbnailsBucket`, key `{id}/thumbnail.jpg`.
+**Storage keys (TD-11):**
+- the original object is in bucket `storage.videosBucket`, key `original_key` (`{id}/original`);
+- the thumbnail is in bucket `storage.thumbnailsBucket`, key `thumbnail_key` (`{id}/thumbnail.jpg`).
 
-Both keys come from pure helpers in `src/videos/video-object-keys.ts` (`videoOriginalKey(id)`, `videoThumbnailKey(id)`). Invariant: `status = 'ready'` ⇒ the thumbnail object exists (the worker writes it before it flips the status).
+Both keys are built only by the pure helpers in `src/videos/video-object-keys.ts` (`videoOriginalKey(id)`, `videoThumbnailKey(id)`) and persisted on the row; readers (upload, worker, playback) use the persisted columns. Invariant: `status = 'ready'` ⇔ `thumbnail_key` is not null, and the thumbnail object exists (the worker writes it before it flips the status).
 **Status transitions (only these are legal):**
 - `uploading → processing` (complete, SI-03.7);
 - `uploading → failed` (complete detects an object over the cap, SI-03.7);
@@ -812,7 +814,7 @@ Both keys come from pure helpers in `src/videos/video-object-keys.ts` (`videoOri
 
 A cancelled draft (`uploading`) is **deleted**, not transitioned (AMB-4).
 
-**Migration:** `CreateVideos{timestamp}` is generated with `npm run migration:generate` (rule: CLI-generated). It creates `videos_status_enum`, the `videos` table, both indexes and the FK. `down()` drops them in reverse order. No existing migration is edited (DG-2, Immutability rule).
+**Migration:** `CreateVideos{timestamp}` is generated with `npm run migration:generate` (rule: CLI-generated). It creates `videos_status_enum`, the `videos` table, both indexes and the FK. `down()` drops them in reverse order. No existing migration is edited (DG-2, Immutability rule). The storage-key columns came later in `AddVideoStorageKeys1791382169844` (CLI-generated; the spurious enum re-creation the CLI emitted was dropped, and a hand-written backfill fills the keys of existing rows before `original_key` becomes `NOT NULL`). `down()` drops both columns.
 
 #### Channel (modified — relation only)
 

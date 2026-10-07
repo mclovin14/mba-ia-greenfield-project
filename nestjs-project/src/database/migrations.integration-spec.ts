@@ -7,6 +7,7 @@ import { Video } from '../videos/entities/video.entity';
 import { CreateUsersAndChannels1775687773260 } from './migrations/1775687773260-CreateUsersAndChannels';
 import { CreateAuthTokens1777579850478 } from './migrations/1777579850478-CreateAuthTokens';
 import { CreateVideos1791237941900 } from './migrations/1791237941900-CreateVideos';
+import { AddVideoStorageKeys1791382169844 } from './migrations/1791382169844-AddVideoStorageKeys';
 import { createTestDataSource } from '../test/create-test-data-source';
 
 const MANAGED_TABLES = [
@@ -41,6 +42,7 @@ describe('Database migrations (integration)', () => {
           CreateUsersAndChannels1775687773260,
           CreateAuthTokens1777579850478,
           CreateVideos1791237941900,
+          AddVideoStorageKeys1791382169844,
         ],
       },
     );
@@ -84,7 +86,7 @@ describe('Database migrations (integration)', () => {
   it('should apply all migrations from scratch and create all managed tables', async () => {
     const ranMigrations = await dataSource.runMigrations();
 
-    expect(ranMigrations).toHaveLength(3);
+    expect(ranMigrations).toHaveLength(4);
     expect(await existingTables(MANAGED_TABLES)).toEqual([
       'channels',
       'refresh_tokens',
@@ -97,25 +99,77 @@ describe('Database migrations (integration)', () => {
     );
   });
 
-  it('should revert the last migration, removing videos and its enum while keeping Phase 02 tables', async () => {
+  const videoColumns = async (): Promise<string[]> => {
+    const result = await dataSource.query<{ column_name: string }[]>(
+      `SELECT column_name FROM information_schema.columns
+       WHERE table_schema = 'public' AND table_name = 'videos'
+         AND column_name IN ('original_key', 'thumbnail_key')
+       ORDER BY column_name`,
+    );
+    return result.map((r) => r.column_name);
+  };
+
+  it('should revert the last migration, removing only the storage key columns', async () => {
     await dataSource.undoLastMigration();
 
-    expect(await existingTables(['videos'])).toEqual([]);
-    expect(await existingEnums(['videos_status_enum'])).toEqual([]);
+    expect(await videoColumns()).toEqual([]);
     expect(await existingTables(MANAGED_TABLES)).toEqual([
       'channels',
       'refresh_tokens',
       'users',
       'verification_tokens',
+      'videos',
     ]);
   });
 
-  it('should re-apply the reverted migration', async () => {
+  it('should backfill the storage keys of existing rows when re-applied', async () => {
+    const [{ id: userId }] = await dataSource.query<{ id: string }[]>(
+      `INSERT INTO "users" ("email", "password")
+       VALUES ('migration_backfill@example.com', 'hashed') RETURNING "id"`,
+    );
+    const [{ id: channelId }] = await dataSource.query<{ id: string }[]>(
+      `INSERT INTO "channels" ("name", "nickname", "user_id")
+       VALUES ('Backfill', 'backfill', $1) RETURNING "id"`,
+      [userId],
+    );
+    const rows = await dataSource.query<{ id: string; status: string }[]>(
+      `INSERT INTO "videos"
+         ("public_id", "channel_id", "title", "status", "original_filename", "mime_type", "size_bytes")
+       VALUES ('backfill001', $1, 'Clip', 'ready', 'clip.mp4', 'video/mp4', 1),
+              ('backfill002', $1, 'Clip', 'uploading', 'clip.mp4', 'video/mp4', 1)
+       RETURNING "id", "status"`,
+      [channelId],
+    );
+
     const ranMigrations = await dataSource.runMigrations();
 
     expect(ranMigrations.map((m) => m.name)).toEqual([
-      'CreateVideos1791237941900',
+      'AddVideoStorageKeys1791382169844',
     ]);
-    expect(await existingTables(['videos'])).toEqual(['videos']);
+    const stored = await dataSource.query<
+      { id: string; original_key: string; thumbnail_key: string | null }[]
+    >(`SELECT "id", "original_key", "thumbnail_key" FROM "videos"`);
+    const ready = rows.find((r) => r.status === 'ready')!;
+    const uploading = rows.find((r) => r.status === 'uploading')!;
+    expect(stored).toEqual(
+      expect.arrayContaining([
+        {
+          id: ready.id,
+          original_key: `${ready.id}/original`,
+          thumbnail_key: `${ready.id}/thumbnail.jpg`,
+        },
+        {
+          id: uploading.id,
+          original_key: `${uploading.id}/original`,
+          thumbnail_key: null,
+        },
+      ]),
+    );
+
+    await dataSource.query(`DELETE FROM "videos"`);
+    await dataSource.query(`DELETE FROM "channels" WHERE "id" = $1`, [
+      channelId,
+    ]);
+    await dataSource.query(`DELETE FROM "users" WHERE "id" = $1`, [userId]);
   });
 });

@@ -2,27 +2,35 @@
 libs:
   "@nestjs/bullmq":
     version: "^11.0.5"
-    context7_id: "n/a — context7 MCP unavailable in this environment; sources: https://docs.nestjs.com/techniques/queues, https://github.com/nestjs/bull/releases, npm registry + published .d.ts of 11.0.5"
+    context7_id: "/nestjs/bull"
+    other_sources: "https://docs.nestjs.com/techniques/queues, https://github.com/nestjs/bull/releases, npm registry + published .d.ts of 11.0.5"
     fetched_at: "2026-10-05T11:58:57-03:00"
+    context7_checked_at: "2026-10-07"
   bullmq:
     version: "^5.81.5"
-    context7_id: "n/a — context7 MCP unavailable in this environment; sources: https://docs.bullmq.io (retrying-failing-jobs, jobs/job-ids, workers/graceful-shutdown, queues/auto-removal-of-jobs, changelog, migrate-from-v5-to-v6), npm registry + published .d.ts"
+    context7_id: "/taskforcesh/bullmq"
+    other_sources: "https://docs.bullmq.io (retrying-failing-jobs, jobs/job-ids, workers/graceful-shutdown, queues/auto-removal-of-jobs, changelog, migrate-from-v5-to-v6), npm registry + published .d.ts"
     fetched_at: "2026-10-05T11:58:57-03:00"
+    context7_checked_at: "2026-10-07"
   "@aws-sdk/client-s3":
     version: "^3.1146.0"
-    context7_id: "n/a — context7 MCP unavailable in this environment; sources: https://github.com/aws/aws-sdk-js-v3 (supplemental-docs/CLIENTS.md, ERROR_HANDLING.md, MD5_FALLBACK.md, issue #6810), https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html, published .d.ts of 3.1146.0"
+    context7_id: "/aws/aws-sdk-js-v3"
+    other_sources: "https://github.com/aws/aws-sdk-js-v3 (supplemental-docs/CLIENTS.md, ERROR_HANDLING.md, MD5_FALLBACK.md, issue #6810), https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html, published .d.ts of 3.1146.0"
     fetched_at: "2026-10-05T11:58:57-03:00"
+    context7_checked_at: "2026-10-07"
   "@aws-sdk/s3-request-presigner":
     version: "^3.1146.0"
-    context7_id: "n/a — context7 MCP unavailable in this environment; sources: https://github.com/aws/aws-sdk-js-v3/tree/main/packages/s3-request-presigner, @smithy/signature-v4 dist (MAX_PRESIGNED_TTL)"
+    context7_id: "/aws/aws-sdk-js-v3"
+    other_sources: "https://github.com/aws/aws-sdk-js-v3/tree/main/packages/s3-request-presigner, @smithy/signature-v4 dist (MAX_PRESIGNED_TTL)"
     fetched_at: "2026-10-05T11:58:57-03:00"
+    context7_checked_at: "2026-10-07"
 sources_mtime:
   docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-05T11:54:31-03:00"
 ---
 
 # phase-03-videos — Library References
 
-These are distilled docs for the libraries decided in this slice. **Context7 was not available** in the environment that produced this file (no `mcp__context7__*` tools were configured). Each library was checked instead against three sources: its official documentation pages, the npm registry metadata (versions, peer dependencies, release dates), and the `.d.ts` typings of the exact published versions. The typings came from an isolated, throw-away install inside the `nestjs-api` container, so the project's `node_modules` was not touched. Re-fetch via Context7 when it becomes available. Installed project baseline: `@nestjs/common`/`@nestjs/core` `^11.0.1`, CommonJS, Node v25.6.0 (container).
+These are distilled docs for the libraries decided in this slice. **Context7 was not available** when this file was first produced (no `mcp__context7__*` tools were configured). Each library was checked instead against three sources: its official documentation pages, the npm registry metadata (versions, peer dependencies, release dates), and the `.d.ts` typings of the exact published versions. The typings came from an isolated, throw-away install inside the `nestjs-api` container, so the project's `node_modules` was not touched. It was later cross-checked through Context7 — see *Context7 cross-check* at the end. Installed project baseline: `@nestjs/common`/`@nestjs/core` `^11.0.1`, CommonJS, Node v25.6.0 (container).
 
 ## @nestjs/bullmq
 
@@ -236,3 +244,18 @@ const downloadUrl = await getSignedUrl(publicClient,
 - Presigning works with any command (README); `UploadPartCommand` follows the same pattern.
 - **Range / 206 — not stated by the fetched docs.** HTTP `Range` is a request header that SigV4 query-signed GETs do not sign by default (only `host` is in the signed headers). The browser can therefore send `Range` freely and S3/MinIO answer `206 Partial Content`. This is standard S3 GetObject behaviour (`GetObjectCommandInput.Range` exists in the typings). **The plan must prove it with an integration test** (request a presigned URL with `Range: bytes=0-1023` and assert 206 + `Content-Range`) rather than rely on this note.
 - **Browser access needs CORS on the bucket.** A browser `PUT` to a presigned part URL needs the `ETag` response header exposed. This is a MinIO/S3 server configuration, not an SDK feature. Record it in the storage bootstrap Tech Spec.
+
+## Context7 cross-check (2026-10-07)
+
+Context7 was added to `.mcp.json` (`@upstash/context7-mcp`, server 4.2.0) and every library above was re-checked through it (`resolve-library-id` → `query-docs`). No API used by the code diverges from what Context7 returned:
+
+| Library | Context7 ID | Checked against the code |
+|---|---|---|
+| `@nestjs/bullmq` | `/nestjs/bull` (monorepo that publishes `@nestjs/bullmq`) | `BullModule.forRootAsync`/`registerQueue`, `@Processor` on a class extending `WorkerHost` with `process(job)`, `getQueueToken`/`@InjectQueue` |
+| `bullmq` | `/taskforcesh/bullmq` | `UnrecoverableError` skips the remaining attempts; `backoff: { type: 'exponential', delay }` retries after `2^(attempts-1) * delay`; an identical `jobId` deduplicates `add` |
+| `@aws-sdk/client-s3` | `/aws/aws-sdk-js-v3` | `forcePathStyle` (v3 name), multipart commands (`CreateMultipartUpload`, `UploadPart`, `CompleteMultipartUpload`), error handling by service exception |
+| `@aws-sdk/s3-request-presigner` | `/aws/aws-sdk-js-v3` | `getSignedUrl(client, command, { expiresIn })`, default 900 s when omitted |
+| `typeorm` (used by the storage-key migration) | `/typeorm/typeorm` | migration generated by the CLI then edited in `up`/`down` via `queryRunner.query`; `@PrimaryGeneratedColumn('uuid')` accepts an explicitly assigned id |
+
+**Version discrepancies (flagged):** Context7 indexes `bullmq` v6.3.11 while the project pins `^5.81.5`, and `typeorm` 0.3.27 while the project has 0.3.28. The APIs above exist in the installed versions (the code that uses them compiles against the installed `.d.ts` and passes the integration suites), so no code change was needed; the v5 → v6 breaking changes listed earlier in this file still apply if the queue is upgraded.
+

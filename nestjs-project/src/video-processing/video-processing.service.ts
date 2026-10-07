@@ -7,10 +7,7 @@ import { StorageObjectNotFoundError } from '../storage/storage.errors';
 import { STORAGE_BUCKETS } from '../storage/storage.constants';
 import { StorageService } from '../storage/storage.service';
 import { VideoStatus } from '../videos/entities/video.entity';
-import {
-  videoOriginalKey,
-  videoThumbnailKey,
-} from '../videos/video-object-keys';
+import { videoThumbnailKey } from '../videos/video-object-keys';
 import { VideoProcessingErrorCode } from '../videos/videos.constants';
 import { VideosService } from '../videos/videos.service';
 import {
@@ -38,7 +35,7 @@ export class VideoProcessingService {
     const video = await this.videosService.findById(videoId);
     if (video?.status !== VideoStatus.Processing) return 'skipped';
 
-    const originalKey = videoOriginalKey(videoId);
+    const originalKey = video.original_key;
     await this.assertSourceExists(originalKey);
     const sourceUrl = await this.storageService.presignGetObject(
       STORAGE_BUCKETS.VIDEOS,
@@ -51,21 +48,26 @@ export class VideoProcessingService {
       sourceUrl,
       thumbnailTimestamp(probe.durationSeconds),
     );
+    const thumbnailKey = videoThumbnailKey(videoId);
     await this.storageService.putObject(
       STORAGE_BUCKETS.THUMBNAILS,
-      videoThumbnailKey(videoId),
+      thumbnailKey,
       thumbnail,
       THUMBNAIL_CONTENT_TYPE,
     );
 
-    const marked = await this.videosService.markReady(videoId, {
-      duration_seconds: probe.durationSeconds,
-      width: probe.video.width,
-      height: probe.video.height,
-      video_codec: probe.video.codec,
-      audio_codec: probe.audioCodec,
-      container_format: probe.formatName,
-    });
+    const marked = await this.videosService.markReady(
+      videoId,
+      {
+        duration_seconds: probe.durationSeconds,
+        width: probe.video.width,
+        height: probe.video.height,
+        video_codec: probe.video.codec,
+        audio_codec: probe.audioCodec,
+        container_format: probe.formatName,
+      },
+      thumbnailKey,
+    );
     return marked ? 'ready' : 'skipped';
   }
 
