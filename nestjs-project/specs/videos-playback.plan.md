@@ -30,7 +30,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #1
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /videos/:publicId/stream com o token do dono
@@ -44,7 +44,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #2
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /videos/:publicId/download com o token do dono
@@ -57,7 +57,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. O rascunho é criado com `filename: "aula 1 — introdução (parte 'a').mp4"` e levado a `ready` como no setup
@@ -74,7 +74,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Com o vídeo em `processing`: GET /stream e GET /download
@@ -84,7 +84,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. `VideosService.markFailed(id, 'NO_VIDEO_STREAM')`; GET /stream e GET /download
@@ -98,7 +98,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /stream e GET /download no `publicId` do dono com o token do não dono
@@ -108,7 +108,7 @@ Um vídeo fora de `ready` recebe `409 VIDEO_NOT_READY`. Não dono e `publicId` i
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /stream e GET /download sem header `Authorization`

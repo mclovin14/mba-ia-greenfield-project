@@ -341,7 +341,9 @@ _Subprojects in scope:_
 
 **Decision:** B (Two buckets keyed by videoId)
 
-**Follow-up (2026-10-07):** the layout is unchanged, but the keys are now also persisted on the row (`videos.original_key`, set on creation; `videos.thumbnail_key`, set when processing succeeds — migration `AddVideoStorageKeys1791382169844`), so the persistence model records the storage keys of the file and the thumbnail as the assignment requires. `src/videos/video-object-keys.ts` remains the only place that builds them.
+**Revisions:**
+
+- 2026-10-07 — The layout is unchanged, but the keys are now also persisted on the row (`videos.original_key`, set on creation; `videos.thumbnail_key`, set when processing succeeds — migration `AddVideoStorageKeys1791382169844`), so the persistence model records the storage keys of the file and the thumbnail as the assignment requires. `src/videos/video-object-keys.ts` remains the only place that builds them.
 
 ---
 

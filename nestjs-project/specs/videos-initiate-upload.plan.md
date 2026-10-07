@@ -31,7 +31,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #1, #7
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos com `Authorization: Bearer {access_token}` e body `{ "filename": "aula.mp4", "mime_type": "video/mp4", "size_bytes": 50000000 }`
@@ -44,7 +44,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #2
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos com body válido e token válido
@@ -58,7 +58,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #1
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos com `{ "filename": "aula.mp4", "mime_type": "video/mp4", "size_bytes": 1, "title": "  Minha aula  " }`
@@ -72,7 +72,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos com `mime_type: "application/pdf"` e o restante válido
@@ -83,7 +83,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos com `size_bytes: 10737418241`
@@ -95,7 +95,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos com body válido mais `"channel_id": "qualquer"`
@@ -105,7 +105,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos sem header `Authorization`, com body válido
@@ -116,7 +116,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Criar e autenticar um usuário e então remover a linha dele em `channels` direto no banco
@@ -132,7 +132,7 @@ O body é validado pelo `ValidationPipe` global: allowlist de MIME e teto de 10 
 
 **Covers AC:** #6
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos 15 vezes em sequência, com o mesmo token e body válido (`size_bytes: 1`)

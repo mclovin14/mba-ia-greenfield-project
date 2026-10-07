@@ -3,7 +3,7 @@ kind: phase
 name: phase-03-videos
 sources_mtime:
   docs/project-plan.md: "2026-10-05T10:48:49-03:00"
-  docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-05T11:54:31-03:00"
+  docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-07T12:27:36-03:00"
   docs/decisions/technical-decisions-openapi-docs-nestjs.md: "2026-10-05T10:48:49-03:00"
   docs/phases/phase-01-configuracao-base/context.md: "2026-10-05T10:48:49-03:00"
   docs/phases/phase-02-auth/context.md: "2026-10-05T10:48:49-03:00"
@@ -134,6 +134,9 @@ _Source files:_
 
 **Recommendation:** separates private originals from thumbnails that later phases will likely serve publicly, at the small cost of provisioning one more bucket.
 **Libraries:** —
+
+**Revisions:**
+- 2026-10-07 — The layout is unchanged, but the keys are now also persisted on the row (`videos.original_key`, set on creation; `videos.thumbnail_key`, set when processing succeeds — migration `AddVideoStorageKeys1791382169844`), so the persistence model records the storage keys of the file and the thumbnail as the assignment requires. `src/videos/video-object-keys.ts` remains the only place that builds them.
 
 ### phase-03-videos/TD-12
 
