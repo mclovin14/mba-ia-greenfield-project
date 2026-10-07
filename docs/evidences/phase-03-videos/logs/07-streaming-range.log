@@ -1,0 +1,12 @@
+# 2026-10-07T16:21:11.017Z  GET /videos/Q34hT1nOgiQ/stream
+HTTP 200
+{
+  "url": "http://localhost:9000/videos/f098a19c-9d5f-483c-b892-dfb76b5331ac/original?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=streamtube%2F20261007%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261007T162110Z&X-Amz-Expires=21600&X-Amz-Signature=…&X-Amz-SignedHeaders=host&response-content-type=video%2Fmp4&x-id=GetObject",
+  "expires_at": "2026-10-07T22:21:10.944Z"
+}
+
+# Requisições com Range direto na URL presignada (sem baixar o arquivo inteiro)
+Range bytes=0-1023          : HTTP 206  Content-Range: bytes 0-1023/10737418240  Content-Length: 1024  Content-Type: video/mp4  Accept-Ranges: bytes  (4 ms)
+Range bytes=5 GiB..+1 MiB   : HTTP 206  Content-Range: bytes 5368709120-5369757695/10737418240  Content-Length: 1048576  Content-Type: video/mp4  Accept-Ranges: bytes  (5 ms)
+Range bytes=-1024 (final)   : HTTP 206  Content-Range: bytes 10737417216-10737418239/10737418240  Content-Length: 1024  Content-Type: video/mp4  Accept-Ranges: bytes  (3 ms)
+Primeiros bytes (ftyp do MP4): ftypisom

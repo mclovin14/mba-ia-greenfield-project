@@ -1,0 +1,45 @@
+# 2026-10-07T16:21:05.201Z  GET / na API a cada 2 s durante o upload de 10 GiB
+amostras: 25   HTTP 200: 25   falhas: 0
+latência (ms): min 2   média 33.9   máx 159
+
+# Primeiras e últimas amostras
+2026-10-07T16:20:06.743Z  HTTP 200  3 ms
+2026-10-07T16:20:08.782Z  HTTP 200  39 ms
+2026-10-07T16:20:10.814Z  HTTP 200  32 ms
+2026-10-07T16:20:13.679Z  HTTP 200  51 ms
+2026-10-07T16:20:15.699Z  HTTP 200  20 ms
+…
+2026-10-07T16:20:52.958Z  HTTP 200  4 ms
+2026-10-07T16:20:54.963Z  HTTP 200  5 ms
+2026-10-07T16:20:56.989Z  HTTP 200  25 ms
+2026-10-07T16:21:00.106Z  HTTP 200  73 ms
+2026-10-07T16:21:02.108Z  HTTP 200  2 ms
+
+# docker stats antes do upload
+nestjs-project-nestjs-api-1  CPU 0.02%  MEM 411.7MiB / 3.824GiB  NET in/out 5.23MB / 58MB
+nestjs-project-video-worker-1  CPU 0.00%  MEM 372.7MiB / 3.824GiB  NET in/out 1.12GB / 2.63MB
+nestjs-project-minio-1  CPU 0.00%  MEM 333.5MiB / 3.824GiB  NET in/out 10.9GB / 11.9GB
+
+# docker stats durante o upload: o NET in da API fica em MB enquanto o do MinIO cresce até ~10 GB
+# (os bytes do vídeo vão do cliente direto ao MinIO, sem passar pela API)
+2026-10-07T16:20:13.624Z  nestjs-project-nestjs-api-1  CPU 0.06%  MEM 403.2MiB / 3.824GiB  NET in/out 5.24MB / 58.1MB
+2026-10-07T16:20:13.624Z  nestjs-project-video-worker-1  CPU 0.03%  MEM 365.2MiB / 3.824GiB  NET in/out 1.12GB / 2.63MB
+2026-10-07T16:20:13.624Z  nestjs-project-minio-1  CPU 0.03%  MEM 359.1MiB / 3.824GiB  NET in/out 12.6GB / 11.9GB
+2026-10-07T16:20:21.004Z  nestjs-project-nestjs-api-1  CPU 0.00%  MEM 402.6MiB / 3.824GiB  NET in/out 5.24MB / 58.1MB
+2026-10-07T16:20:21.004Z  nestjs-project-video-worker-1  CPU 0.01%  MEM 364.7MiB / 3.824GiB  NET in/out 1.12GB / 2.63MB
+2026-10-07T16:20:21.004Z  nestjs-project-minio-1  CPU 0.11%  MEM 336.7MiB / 3.824GiB  NET in/out 14.2GB / 11.9GB
+2026-10-07T16:20:29.734Z  nestjs-project-nestjs-api-1  CPU 0.03%  MEM 404.5MiB / 3.824GiB  NET in/out 5.25MB / 58.2MB
+2026-10-07T16:20:29.734Z  nestjs-project-video-worker-1  CPU 1.05%  MEM 377MiB / 3.824GiB  NET in/out 1.12GB / 2.64MB
+2026-10-07T16:20:29.734Z  nestjs-project-minio-1  CPU 0.04%  MEM 357.6MiB / 3.824GiB  NET in/out 15.9GB / 11.9GB
+2026-10-07T16:20:41.662Z  nestjs-project-nestjs-api-1  CPU 0.01%  MEM 278.8MiB / 3.824GiB  NET in/out 5.25MB / 58.2MB
+2026-10-07T16:20:41.662Z  nestjs-project-video-worker-1  CPU 0.00%  MEM 364.4MiB / 3.824GiB  NET in/out 1.12GB / 2.64MB
+2026-10-07T16:20:41.662Z  nestjs-project-minio-1  CPU 0.07%  MEM 381.4MiB / 3.824GiB  NET in/out 17.6GB / 11.9GB
+2026-10-07T16:20:50.897Z  nestjs-project-nestjs-api-1  CPU 0.01%  MEM 286.5MiB / 3.824GiB  NET in/out 5.26MB / 58.3MB
+2026-10-07T16:20:50.897Z  nestjs-project-video-worker-1  CPU 0.06%  MEM 373.2MiB / 3.824GiB  NET in/out 1.12GB / 2.64MB
+2026-10-07T16:20:50.897Z  nestjs-project-minio-1  CPU 0.02%  MEM 366.4MiB / 3.824GiB  NET in/out 19.3GB / 11.9GB
+2026-10-07T16:21:00.020Z  nestjs-project-nestjs-api-1  CPU 0.04%  MEM 296.9MiB / 3.824GiB  NET in/out 5.26MB / 58.4MB
+2026-10-07T16:21:00.020Z  nestjs-project-video-worker-1  CPU 0.25%  MEM 373.9MiB / 3.824GiB  NET in/out 1.12GB / 2.64MB
+2026-10-07T16:21:00.020Z  nestjs-project-minio-1  CPU 1.15%  MEM 359.6MiB / 3.824GiB  NET in/out 21GB / 11.9GB
+2026-10-07T16:21:05.098Z  nestjs-project-nestjs-api-1  CPU 0.03%  MEM 289.1MiB / 3.824GiB  NET in/out 5.27MB / 58.4MB
+2026-10-07T16:21:05.098Z  nestjs-project-video-worker-1  CPU 0.37%  MEM 364.8MiB / 3.824GiB  NET in/out 1.12GB / 2.64MB
+2026-10-07T16:21:05.098Z  nestjs-project-minio-1  CPU 1.21%  MEM 352.3MiB / 3.824GiB  NET in/out 21.6GB / 11.9GB

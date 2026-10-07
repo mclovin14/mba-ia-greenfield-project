@@ -1,0 +1,43 @@
+# 2026-10-07T16:21:10.796Z  Linha do tempo do status (polling de GET /videos/Q34hT1nOgiQ)
+2026-10-07T16:21:05.648Z  status = processing (resposta do complete)
+2026-10-07T16:21:05.741Z  status = processing
+2026-10-07T16:21:10.784Z  status = ready
+
+# GET /videos/Q34hT1nOgiQ
+{
+  "public_id": "Q34hT1nOgiQ",
+  "title": "Evidência — vídeo de 10 GiB",
+  "description": null,
+  "status": "ready",
+  "original_filename": "video-10gib.mp4",
+  "mime_type": "video/mp4",
+  "size_bytes": 10737418240,
+  "duration_seconds": 67.134,
+  "width": 1920,
+  "height": 1080,
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "container_format": "mov,mp4,m4a,3gp,3g2,mj2",
+  "processing_error": null,
+  "thumbnail_url": "http://localhost:9000/thumbnails/f098a19c-9d5f-483c-b892-dfb76b5331ac/thumbnail.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=streamtube%2F20261007%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261007T162110Z&X-Amz-Expires=900&X-Amz-Signature=…&X-Amz-SignedHeaders=host&response-content-type=image%2Fjpeg&x-id=GetObject",
+  "created_at": "2026-10-07T16:20:04.317Z",
+  "updated_at": "2026-10-07T16:21:10.609Z"
+}
+
+# Thumbnail via thumbnail_url -> HTTP 200, image/jpeg, 147584 bytes (assets/thumbnail-10gib.jpg)
+
+# Banco após o processamento
+  public_id  | status | duration_seconds | width | height | video_codec | audio_codec |    container_format     |                   thumbnail_key                    | processing_error 
+-------------+--------+------------------+-------+--------+-------------+-------------+-------------------------+----------------------------------------------------+------------------
+ Q34hT1nOgiQ | ready  |           67.134 |  1920 |   1080 | h264        | aac         | mov,mp4,m4a,3gp,3g2,mj2 | f098a19c-9d5f-483c-b892-dfb76b5331ac/thumbnail.jpg | 
+(1 row)
+
+
+# Job concluído na fila (bull:video-processing:video-f098a19c-9d5f-483c-b892-dfb76b5331ac)
+name          process-video
+data          {"videoId":"f098a19c-9d5f-483c-b892-dfb76b5331ac"}
+attemptsMade  (vazio)
+processedOn   1791390065222
+finishedOn    1791390070623
+failedReason  (vazio)
+# Chaves no storage: videos/f098a19c-9d5f-483c-b892-dfb76b5331ac/original e thumbnails/f098a19c-9d5f-483c-b892-dfb76b5331ac/thumbnail.jpg

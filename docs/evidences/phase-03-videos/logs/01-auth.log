@@ -1,0 +1,5 @@
+# 2026-10-07T16:20:04.365Z  usuário evidence_1791390004042@example.com
+POST /auth/register -> 201
+Confirmation e-mail read from Mailpit
+GET /auth/confirm-email -> 204
+POST /auth/login -> 200 (access_token received)
