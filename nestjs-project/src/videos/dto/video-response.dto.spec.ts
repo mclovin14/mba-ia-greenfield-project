@@ -13,6 +13,8 @@ const buildVideo = (): Video =>
     mime_type: 'video/mp4',
     size_bytes: 1024,
     upload_id: 'multipart-upload-id',
+    original_key: 'video-uuid/original',
+    thumbnail_key: 'video-uuid/thumbnail.jpg',
     duration_seconds: 12.5,
     width: 1920,
     height: 1080,
@@ -25,12 +27,14 @@ const buildVideo = (): Video =>
   });
 
 describe('toVideoResponse', () => {
-  it('should never expose id, channel_id or upload_id', () => {
+  it('should never expose id, channel_id, upload_id or storage keys', () => {
     const response = toVideoResponse(buildVideo(), null);
 
     expect(response).not.toHaveProperty('id');
     expect(response).not.toHaveProperty('channel_id');
     expect(response).not.toHaveProperty('upload_id');
+    expect(response).not.toHaveProperty('original_key');
+    expect(response).not.toHaveProperty('thumbnail_key');
   });
 
   it('should use the given thumbnail URL as thumbnail_url', () => {

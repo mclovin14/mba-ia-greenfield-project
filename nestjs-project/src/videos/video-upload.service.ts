@@ -22,7 +22,6 @@ import { PartNumberOutOfRangeException } from './exceptions/part-number-out-of-r
 import { UploadIncompleteException } from './exceptions/upload-incomplete.exception';
 import { VideoFileTooLargeException } from './exceptions/video-file-too-large.exception';
 import { VideoNotFoundException } from './exceptions/video-not-found.exception';
-import { videoOriginalKey } from './video-object-keys';
 import { deriveDefaultTitle } from './video-title';
 import {
   VIDEO_MAX_PART_URLS_PER_REQUEST,
@@ -61,7 +60,7 @@ export class VideoUploadService {
     let uploadId: string;
     try {
       uploadId = await this.storageService.createMultipartUpload(
-        videoOriginalKey(video.id),
+        video.original_key,
         dto.mime_type,
       );
     } catch (err) {
@@ -93,7 +92,7 @@ export class VideoUploadService {
     }
 
     const signedAt = Date.now();
-    const key = videoOriginalKey(video.id);
+    const key = video.original_key;
     const parts = await Promise.all(
       partNumbers.map(async (partNumber) => ({
         part_number: partNumber,
@@ -120,7 +119,7 @@ export class VideoUploadService {
   ): Promise<UploadedPartsResponseDto> {
     const video = await this.findUploading(userId, publicId);
     const stored = await this.storageService.listParts(
-      videoOriginalKey(video.id),
+      video.original_key,
       video.upload_id,
     );
 
@@ -151,7 +150,7 @@ export class VideoUploadService {
     );
     if (!deleted) throw new InvalidUploadStateException();
 
-    const key = videoOriginalKey(video.id);
+    const key = video.original_key;
     if (video.upload_id !== null) {
       try {
         await this.storageService.abortMultipartUpload(key, video.upload_id);
@@ -180,7 +179,7 @@ export class VideoUploadService {
       throw new InvalidUploadStateException();
     }
 
-    const key = videoOriginalKey(video.id);
+    const key = video.original_key;
     await this.assembleObject(key, video as UploadingVideo);
 
     const { contentLength } = await this.storageService.headObject(

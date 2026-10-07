@@ -64,6 +64,14 @@ export class Video {
   @Column({ type: 'varchar', length: 1024, nullable: true })
   upload_id: string | null;
 
+  /** Key of the original file in the `videos` bucket, set on creation. */
+  @Column({ type: 'varchar', length: 255 })
+  original_key: string;
+
+  /** Key in the `thumbnails` bucket; null until processing succeeds. */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  thumbnail_key: string | null;
+
   @Column({ type: 'double precision', nullable: true })
   duration_seconds: number | null;
 

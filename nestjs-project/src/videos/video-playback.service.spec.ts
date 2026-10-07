@@ -23,6 +23,9 @@ const buildVideo = (status: VideoStatus): Video =>
     mime_type: 'video/mp4',
     size_bytes: 2048,
     upload_id: null,
+    original_key: 'video-uuid/original',
+    thumbnail_key:
+      status === VideoStatus.Ready ? 'video-uuid/thumbnail.jpg' : null,
     duration_seconds: status === VideoStatus.Ready ? 3 : null,
     width: status === VideoStatus.Ready ? 320 : null,
     height: status === VideoStatus.Ready ? 240 : null,

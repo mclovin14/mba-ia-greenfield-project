@@ -44,6 +44,7 @@ describe('VideoProcessingService', () => {
     videosService.findById.mockResolvedValue({
       id: VIDEO_ID,
       status: VideoStatus.Processing,
+      original_key: `${VIDEO_ID}/original`,
     } as Video);
     videosService.markReady.mockResolvedValue(true);
     storageService.headObject.mockResolvedValue({ contentLength: 2048 });
@@ -191,14 +192,18 @@ describe('VideoProcessingService', () => {
 
       await service.process(VIDEO_ID);
 
-      expect(videosService.markReady).toHaveBeenCalledWith(VIDEO_ID, {
-        duration_seconds: 30,
-        width: 1280,
-        height: 720,
-        video_codec: 'h264',
-        audio_codec: null,
-        container_format: 'mov,mp4,m4a,3gp,3g2,mj2',
-      });
+      expect(videosService.markReady).toHaveBeenCalledWith(
+        VIDEO_ID,
+        {
+          duration_seconds: 30,
+          width: 1280,
+          height: 720,
+          video_codec: 'h264',
+          audio_codec: null,
+          container_format: 'mov,mp4,m4a,3gp,3g2,mj2',
+        },
+        `${VIDEO_ID}/thumbnail.jpg`,
+      );
     });
   });
 });

@@ -60,6 +60,20 @@ describe('VideosService', () => {
       expect(video.public_id).toBe(second);
     });
 
+    it('should derive original_key from the id generated for each attempt', async () => {
+      insert
+        .mockRejectedValueOnce(uniqueViolationOn('public_id'))
+        .mockResolvedValueOnce(undefined);
+
+      const video = await service.createDraft(DRAFT_INPUT);
+
+      const [first, second] = (insert.mock.calls as [Partial<Video>][]).map(
+        ([v]) => v,
+      );
+      expect(second.id).not.toBe(first.id);
+      expect(video.original_key).toBe(`${video.id}/original`);
+    });
+
     it('should rethrow a unique violation on another column without retrying', async () => {
       const error = uniqueViolationOn('channel_id');
       insert.mockRejectedValueOnce(error);
