@@ -6,13 +6,15 @@ StreamTube — a video sharing platform (YouTube-like). Users can upload, manage
 
 More info in the project overview: [docs/project-plan.md](docs/project-plan.md)
 
+**Current state (after Phase 03 — videos):** authentication (Phase 02) and direct-to-storage video upload with asynchronous processing (Phase 03) are implemented in the backend. Every video route still requires a JWT and only the owning user can see a video; anonymous viewing, publishing and social features are planned for later phases (see the project plan).
+
 ## Repository Structure
 
 This is a monorepo with two main areas:
 
-- `nestjs-project/` — Backend API (NestJS 11, TypeScript, Express). Contains modules for users, channels, videos, comments, etc.
-- `docs/` — Project documentation, architecture diagrams, and planning.
-- `next-frontend/` (Next.js) — not yet initialized
+- `nestjs-project/` — Backend (NestJS 11, TypeScript, Express). One codebase, two processes: the HTTP API (`src/main.ts`) and the video worker (`src/worker.ts`). Modules: auth, users, channels, mail, videos, video-processing, storage, media, queue. See `nestjs-project/CLAUDE.md`.
+- `docs/` — Project documentation, architecture diagrams, and planning (per-phase plans in `docs/phases/`).
+- `next-frontend/` — Frontend (Next.js), with its own `next-frontend/CLAUDE.md`.
 
 ## Architecture (C4 Container Diagram)
 
@@ -20,10 +22,10 @@ See `docs/diagrams/software-arch.mermaid` for the full diagram. Key containers:
 
 - **Frontend** (Next.js) → calls API via REST, streams from Object Storage
 - **API** (Nest.js) → business rules, auth, reads/writes DB, uploads to storage, publishes jobs to queue, sends emails
-- **Video Worker** (FFmpeg) → consumes jobs from queue, processes videos, updates DB and storage
-- **Database** (PostgreSQL) → users, channels, videos, comments, likes
-- **Object Storage** (S3/MinIO) → video files and thumbnails
-- **Message Queue** (TBD) → video processing job queue
+- **Video Worker** (FFmpeg) → consumes jobs from queue, processes videos, updates DB and storage. Same `nestjs-project` codebase, entry point `src/worker.ts`, Compose service `video-worker`
+- **Database** (PostgreSQL) → users, channels, auth tokens, videos today; comments and likes are planned
+- **Object Storage** (S3/MinIO) → video files and thumbnails (buckets `videos` and `thumbnails`); clients upload and download directly via presigned URLs, video bytes never pass through the API
+- **Message Queue** (BullMQ on Redis, Compose service `redis`) → `video-processing` queue
 - **Email Service** (SMTP) → account confirmation and password recovery
 
 ## Docker Networking
@@ -36,6 +38,8 @@ Inside a container, `localhost` refers to the container itself, not the host mac
 - **Wrong:** `DB_HOST=localhost`
 
 This applies to all environment variables, configuration files, and code that references service hosts.
+
+The only documented exception is `S3_PUBLIC_ENDPOINT`, a browser-facing host used solely to sign presigned URLs — see `nestjs-project/CLAUDE.md` → "Storage endpoints".
 
 ## Working Principles
 
