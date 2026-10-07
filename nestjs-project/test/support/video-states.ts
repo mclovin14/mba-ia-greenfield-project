@@ -87,14 +87,18 @@ export async function createVideoStates(
       jpeg,
       THUMBNAIL_CONTENT_TYPE,
     );
-    const marked = await videosService.markReady(id, {
-      duration_seconds: probe.durationSeconds,
-      width: probe.video!.width,
-      height: probe.video!.height,
-      video_codec: probe.video!.codec,
-      audio_codec: probe.audioCodec,
-      container_format: probe.formatName,
-    });
+    const marked = await videosService.markReady(
+      id,
+      {
+        duration_seconds: probe.durationSeconds,
+        width: probe.video!.width,
+        height: probe.video!.height,
+        video_codec: probe.video!.codec,
+        audio_codec: probe.audioCodec,
+        container_format: probe.formatName,
+      },
+      videoThumbnailKey(id),
+    );
     expect(marked).toBe(true);
   };
 

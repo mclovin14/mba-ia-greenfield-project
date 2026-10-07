@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import type { DataSource } from 'typeorm';
 import { Channel } from '../channels/entities/channel.entity';
@@ -25,7 +26,10 @@ export async function seedProcessingVideo(
     nickname: `proc${suffix}`,
     user_id: user.id,
   });
+  const id = randomUUID();
   return dataSource.getRepository(Video).save({
+    id,
+    original_key: videoOriginalKey(id),
     public_id: `p${suffix}`.padEnd(11, '0').slice(0, 11),
     channel_id: channel.id,
     title: 'Clip',

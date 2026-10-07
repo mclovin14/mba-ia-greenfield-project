@@ -53,6 +53,7 @@ describe('Video entity (integration)', () => {
     original_filename: 'clip.mp4',
     mime_type: 'video/mp4',
     size_bytes: 1024,
+    original_key: 'some-id/original',
     ...overrides,
   });
 
@@ -82,6 +83,13 @@ describe('Video entity (integration)', () => {
     expect(stored.description).toBeNull();
     expect(stored.upload_id).toBeNull();
     expect(stored.processing_error).toBeNull();
+    expect(stored.thumbnail_key).toBeNull();
+  });
+
+  it('should reject a video without original_key (not-null violation 23502)', async () => {
+    const error = await insertCaught(buildVideo({ original_key: undefined }));
+
+    expect(pgCode(error)).toBe('23502');
   });
 
   it('should reject a status outside the enum domain', async () => {

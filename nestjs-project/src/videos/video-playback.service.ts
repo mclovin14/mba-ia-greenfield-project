@@ -10,7 +10,6 @@ import {
 } from './dto/video-response.dto';
 import { type Video, VideoStatus } from './entities/video.entity';
 import { VideoNotReadyException } from './exceptions/video-not-ready.exception';
-import { videoOriginalKey, videoThumbnailKey } from './video-object-keys';
 import {
   VIDEO_DOWNLOAD_URL_TTL_SECONDS,
   VIDEO_STREAM_URL_TTL_SECONDS,
@@ -35,10 +34,10 @@ export class VideoPlaybackService {
       userId,
     );
     const thumbnailUrl =
-      video.status === VideoStatus.Ready
+      video.status === VideoStatus.Ready && video.thumbnail_key !== null
         ? await this.storageService.presignGetObject(
             STORAGE_BUCKETS.THUMBNAILS,
-            videoThumbnailKey(video.id),
+            video.thumbnail_key,
             {
               client: 'public',
               expiresIn: VIDEO_THUMBNAIL_URL_TTL_SECONDS,
@@ -96,7 +95,7 @@ export class VideoPlaybackService {
     const signedAt = Date.now();
     const url = await this.storageService.presignGetObject(
       STORAGE_BUCKETS.VIDEOS,
-      videoOriginalKey(video.id),
+      video.original_key,
       { client: 'public', expiresIn, ...response },
     );
     return {
