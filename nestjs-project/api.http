@@ -118,3 +118,66 @@ Content-Type: {{contentType}}
   "token": "{{resetToken}}",
   "new_password": "new-password123"
 }
+
+
+###
+# ─────────────────────────────────────────────
+# VÍDEOS — UPLOAD DIRETO, PROCESSAMENTO E REPRODUÇÃO
+# ─────────────────────────────────────────────
+# Os bytes do vídeo vão direto para o storage: o PUT de cada parte usa a URL
+# presignada devolvida por part-urls (ex.: curl -T parte1.bin "<url>"),
+# nunca a API. Faça o login (requisição 4) antes.
+
+@publicId = {{initiateUpload.response.body.$.video.public_id}}
+
+### 10. Iniciar upload — cria o rascunho 'uploading' e o multipart upload
+# @name initiateUpload
+POST {{baseUrl}}/videos
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "filename": "aula.mp4",
+  "mime_type": "video/mp4",
+  "size_bytes": 1048576
+}
+
+
+### 11. URLs presignadas das partes (até 100 por requisição, válidas por 1 h)
+POST {{baseUrl}}/videos/{{publicId}}/upload/part-urls
+Authorization: Bearer {{accessToken}}
+Content-Type: {{contentType}}
+
+{
+  "part_numbers": [1]
+}
+
+
+### 12. Partes já enviadas — para retomar um upload interrompido
+GET {{baseUrl}}/videos/{{publicId}}/upload/parts
+Authorization: Bearer {{accessToken}}
+
+
+### 13. Concluir upload — 202, o vídeo passa a 'processing' e entra na fila
+POST {{baseUrl}}/videos/{{publicId}}/upload/complete
+Authorization: Bearer {{accessToken}}
+
+
+### 14. Consultar vídeo — polling do status; thumbnail_url quando 'ready'
+GET {{baseUrl}}/videos/{{publicId}}
+Authorization: Bearer {{accessToken}}
+
+
+### 15. URL de streaming (válida por 6 h, suporta Range) — 409 se não 'ready'
+GET {{baseUrl}}/videos/{{publicId}}/stream
+Authorization: Bearer {{accessToken}}
+
+
+### 16. URL de download (válida por 15 min, Content-Disposition: attachment)
+GET {{baseUrl}}/videos/{{publicId}}/download
+Authorization: Bearer {{accessToken}}
+
+
+### 17. Cancelar upload em andamento — 204, remove rascunho e bytes enviados
+DELETE {{baseUrl}}/videos/{{publicId}}/upload
+Authorization: Bearer {{accessToken}}
