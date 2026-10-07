@@ -1,0 +1,29 @@
+# Definition of Done — executado dentro do container nestjs-api (2026-10-07 13:28:01)
+
+$ npx tsc --noEmit
+exit code = 0
+
+$ npm run lint
+exit code = 0
+
+$ npm test
+Test Suites: 53 passed, 53 total
+Tests:       341 passed, 341 total
+Snapshots:   0 total
+Time:        29.546 s
+exit code = 0
+
+$ npm run test:integration
+Test Suites: 20 passed, 20 total
+Tests:       140 passed, 140 total
+Snapshots:   0 total
+Time:        20.887 s, estimated 21 s
+exit code = 0
+
+$ npm run test:e2e
+Test Suites: 9 passed, 9 total
+Tests:       96 passed, 96 total
+Snapshots:   0 total
+Time:        21.248 s
+exit code = 0
+

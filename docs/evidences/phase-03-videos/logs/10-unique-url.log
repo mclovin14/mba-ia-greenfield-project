@@ -1,0 +1,25 @@
+# 2026-10-07T16:21:33.464Z  public_id gerado para 5 rascunhos criados em sequência (depois cancelados)
+POST /videos -> public_id NoJEp4TkHc0   título default "rascunho-0"
+POST /videos -> public_id zb7G09v5Zrw   título default "rascunho-1"
+POST /videos -> public_id vgrSwH5MReE   título default "rascunho-2"
+POST /videos -> public_id vZYlx2mT_4E   título default "rascunho-3"
+POST /videos -> public_id SGtV0kYSvxY   título default "rascunho-4"
+Distintos: 5/5
+
+# Unicidade garantida no banco (índice UNIQUE em public_id)
+           indexname            |                                           indexdef                                            
+--------------------------------+-----------------------------------------------------------------------------------------------
+ PK_e4c86c0cf95aff16e9fb8220f6b | CREATE UNIQUE INDEX "PK_e4c86c0cf95aff16e9fb8220f6b" ON public.videos USING btree (id)
+ IDX_39a1f0fe7991162aace659078e | CREATE UNIQUE INDEX "IDX_39a1f0fe7991162aace659078e" ON public.videos USING btree (public_id)
+ IDX_023a8e4f3f1a34ff3d8ca04a4c | CREATE INDEX "IDX_023a8e4f3f1a34ff3d8ca04a4c" ON public.videos USING btree (channel_id)
+(3 rows)
+
+
+ videos | public_ids_distintos 
+--------+----------------------
+     19 |                   19
+(1 row)
+
+
+# A URL do vídeo usa só o public_id; o id interno (uuid) nunca é exposto
+Vídeo de 10 GiB: /videos/Q34hT1nOgiQ
