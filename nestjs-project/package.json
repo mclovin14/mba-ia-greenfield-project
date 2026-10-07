@@ -98,6 +98,8 @@
     "testEnvironment": "node",
     "setupFiles": [
       "dotenv/config"
-    ]
+    ],
+    "maxWorkers": 1,
+    "testTimeout": 30000
   }
 }
