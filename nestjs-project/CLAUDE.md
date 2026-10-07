@@ -198,6 +198,8 @@ Storage object keys (`videos/video-object-keys.ts`): original at `{videoId}/orig
 
 `uploading` → `processing` → `ready` | `failed` (`VideoStatus`, `videos_status_enum`).
 
+This is the phase's "rascunho → processando → pronto / erro" cycle: `uploading` is the draft pre-registered at upload start, `processing` / `ready` / `failed` map to processando / pronto / erro. The column holds processing state only (`phase-03-videos/TD-08`, option A; a combined `draft` status was rejected): there is no publication column yet, so every video is an unlisted draft until Fase 04 adds publication as a separate field (`AMB-1` in `docs/phases/phase-03-videos/validation.md`).
+
 1. `POST /videos` creates the row (`uploading`) and an S3 multipart upload; the response carries the upload plan (16 MiB parts, at most 100 part URLs per request).
 2. The client requests presigned part URLs and `PUT`s each part **directly to MinIO** — video bytes never go through the API.
 3. `POST .../upload/complete` checks that every part is stored, completes the multipart upload, re-reads the real size (`HEAD`), and either fails the video with `FILE_TOO_LARGE` (over 10 GiB: object deleted, 422, nothing enqueued) or moves it to `processing` and enqueues a job. A repeated complete on a `processing` video only re-enqueues.
