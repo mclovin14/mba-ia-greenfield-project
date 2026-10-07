@@ -1,7 +1,7 @@
 # phase-03-videos — Progress
 
 **Status:** completed
-**SIs:** 15/15 completed
+**SIs:** 16/16 completed
 
 ### SI-03.1 — Infra: Redis, MinIO, serviço video-worker e namespaces de configuração
 - **Status:** completed
@@ -164,6 +164,11 @@
   - **Fixture ausente:** a suíte falha nos 2 testes com a mensagem que aponta para `npm run fixtures:large`. Verificado renomeando o arquivo temporariamente.
   - **Isolamento da suíte:** `test/jest-large.json` usa `testRegex \.large-spec\.ts$` e `testTimeout 3600000`. A suíte não é listada pelas configs de `npm test` nem de `test:e2e` (`--listTests`).
   - **EPERM nos scripts:** `npm run test:large` passa pelo `.bin/jest`, que tem o mesmo EPERM dos outros binários, então a suíte foi rodada com `node node_modules/jest/bin/jest.js --config ./test/jest-large.json --runInBand`. Já `npm run fixtures:large` funciona, porque chama `bash`.
+
+### SI-03.14 (amendment of SI-03.4) — Chaves de storage do original e do thumbnail persistidas no vídeo
+- **Status:** completed
+- **Tests:** ver a entrada "Correção pós-entrega — chaves de storage persistidas" abaixo (341 / 96, `tsc` 0, lint 0).
+- **Observations:** Appended by /plan-build append-mode on 2026-10-07; tracks delta from phase-03-videos/TD-11 Revision 2026-10-07. Entra como `completed`, e não `pending`, porque o código já tinha sido entregue e verificado no commit `d115040` antes da emenda. A emenda só formaliza no plano o trabalho registrado na entrada abaixo.
 
 ### Correção pós-entrega — chaves de storage persistidas e context7 (2026-10-07)
 - **Status:** completed

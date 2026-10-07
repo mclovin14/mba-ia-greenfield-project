@@ -3,9 +3,9 @@ kind: phase
 name: phase-03-videos
 test_specs_aware: true
 sources_mtime:
-  docs/phases/phase-03-videos/context.md: "2026-10-05T11:56:07-03:00"
-  docs/phases/phase-03-videos/library-refs.md: "2026-10-05T12:00:27-03:00"
-  docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-05T11:54:31-03:00"
+  docs/phases/phase-03-videos/context.md: "2026-10-07T12:30:03-03:00"
+  docs/phases/phase-03-videos/library-refs.md: "2026-10-07T11:25:38-03:00"
+  docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-07T12:27:36-03:00"
 ---
 
 # Phase 03 — Upload e Processamento de Vídeos
@@ -767,6 +767,38 @@ _Auto-split rationale: original SI would have 8 Technical actions; split per "in
 
 ---
 
+### SI-03.14 (amendment of SI-03.4) — Chaves de storage do original e do thumbnail persistidas no vídeo
+
+**Description:** Emenda retroativa de SI-03.4, que derivava as chaves de storage do id sem gravá-las (delta de `phase-03-videos/TD-11` Revision 2026-10-07). O layout de buckets e chaves não muda. A linha de `videos` passa a registrar a chave do original e a do thumbnail, como pede o enunciado.
+
+**Technical actions:**
+
+1. Adicionar em `src/videos/entities/video.entity.ts` as colunas `original_key` e `thumbnail_key`, exatamente como em `### Data Model → Video`.
+2. Gerar a migration com `docker compose exec nestjs-api npm run migration:generate -- src/database/migrations/AddVideoStorageKeys` (regra: gerada pelo CLI). Remover a recriação espúria de `videos_status_enum`, porque o enum não muda. Antes do `SET NOT NULL` de `original_key`, acrescentar à mão o backfill das linhas existentes: `{id}/original` em todas e `{id}/thumbnail.jpg` nas `ready`. O `down()` remove as duas colunas. **Nenhuma migration existente é editada** (Immutability rule).
+3. `VideosService.createDraft` gera o uuid (`randomUUID`) antes do insert e grava `original_key = videoOriginalKey(id)` na mesma escrita. A transição `processing → ready` grava `thumbnail_key = videoThumbnailKey(id)`.
+4. Upload, worker e playback leem as colunas persistidas. `src/videos/video-object-keys.ts` continua sendo o único lugar que monta as chaves.
+5. `src/database/migrations.integration-spec.ts` passa a aplicar 4 migrations e cobre o revert de `AddVideoStorageKeys` e o backfill.
+
+**Tests:**
+
+| Artifact | Layer | Test file |
+|----------|-------|-----------|
+| `Video` | Integration: `original_key` obrigatório (insert sem ela falha com `23502`) | `src/videos/entities/video.entity.integration-spec.ts` |
+| `VideosService.createDraft` | Integration: persiste `original_key = {id}/original` e deixa `thumbnail_key` nulo; `original_key` acompanha o id de cada tentativa | `src/videos/videos.service.integration-spec.ts` |
+| Migrations | Integration: reverte `AddVideoStorageKeys` e verifica o backfill de linhas existentes (`uploading` e `ready`) | `src/database/migrations.integration-spec.ts` |
+| Worker / playback | Unit: `markReady` recebe e grava `thumbnail_key`; o playback usa as chaves persistidas | `src/video-processing/video-processing.service.spec.ts`, `src/videos/video-playback.service.spec.ts` |
+
+**Dependencies:** SI-03.4 (entidade e migration `CreateVideos`), SI-03.9.2 (transição `processing → ready`) e SI-03.11 (playback).
+
+**Acceptance criteria:**
+
+- `npm run migration:run` sobre o schema com `CreateVideos` adiciona `original_key` (`NOT NULL`) e `thumbnail_key` (nullable). Linhas existentes recebem as chaves pelo backfill. `npm run migration:revert` remove as duas colunas.
+- Um vídeo recém-iniciado tem `original_key = {id}/original` e `thumbnail_key = null`.
+- Um vídeo `ready` tem `thumbnail_key = {id}/thumbnail.jpg`. O invariante é `status = 'ready'` ⇔ `thumbnail_key` não nulo.
+- A suíte completa continua verde: unit + integration, e2e, `tsc --noEmit` e lint.
+
+---
+
 ## Technical Specifications
 
 ### Data Model
@@ -1211,6 +1243,7 @@ SI-03.1 (root — Redis, MinIO, video-worker, ffmpeg na imagem, namespaces de co
 - [ ] SI-03.11 — Endpoints GET /videos/:publicId/stream e /download: URLs presignadas de reprodução e download
 - [ ] SI-03.12 — Fluxo ponta a ponta: upload direto → processamento → reprodução, e contrato OpenAPI
 - [ ] SI-03.13 — Verificação do limite de 10 GiB com um vídeo real
+- [ ] SI-03.14 (amendment of SI-03.4) — Chaves de storage do original e do thumbnail persistidas no vídeo
 
 **Full test suites:**
 

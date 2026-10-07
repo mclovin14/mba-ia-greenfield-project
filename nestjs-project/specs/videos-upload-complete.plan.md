@@ -34,7 +34,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #1, #2
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/:publicId/upload/complete, sem body
@@ -50,7 +50,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST complete
@@ -68,7 +68,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Enviar só a parte 1 de 2 e chamar POST complete
@@ -82,7 +82,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Rascunho com `size_bytes: 2048` declarado em 2 partes não é possível (o `part_count` é 1). Por isso o rascunho tem `size_bytes: 16777217` (`part_count = 2`) e a parte 1 é enviada com só 1024 bytes, abaixo dos 5 MiB mínimos, junto com a parte 2
@@ -94,7 +94,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Mover o vídeo para `ready` direto no banco e chamar POST complete
@@ -111,7 +111,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #6
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Este cenário não monta 10 GiB no e2e (isso é o SI-03.13). Ele exercita o mesmo ramo HTTP com o teto rebaixado: o módulo de teste usa `overrideProvider` para substituir apenas o valor de `VIDEO_MAX_SIZE_BYTES` por 5242880. Se a constante não for injetável, o cenário é coberto pela suíte de 10 GiB (`test/videos-10gib.large-spec.ts`) e este passo é removido na implementação
@@ -130,7 +130,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #7
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST complete no `publicId` do dono com o token do não dono
@@ -142,7 +142,7 @@ Repetir o complete com o vídeo em `processing` é idempotente: devolve 202 e n�
 
 **Covers AC:** #7
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/abc/upload/complete com o token do dono
