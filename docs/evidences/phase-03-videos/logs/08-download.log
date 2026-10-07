@@ -1,0 +1,13 @@
+# 2026-10-07T16:21:31.983Z  GET /videos/Q34hT1nOgiQ/download
+HTTP 200
+{
+  "url": "http://localhost:9000/videos/f098a19c-9d5f-483c-b892-dfb76b5331ac/original?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=streamtube%2F20261007%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261007T162110Z&X-Amz-Expires=900&X-Amz-Signature=…&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22video-10gib.mp4%22%3B%20filename%2A%3DUTF-8%27%27video-10gib.mp4&x-id=GetObject",
+  "expires_at": "2026-10-07T16:36:10.960Z"
+}
+
+# Download completo pela URL presignada (corpo descartado, bytes contados)
+HTTP 200
+Content-Disposition: attachment; filename="video-10gib.mp4"; filename*=UTF-8''video-10gib.mp4
+Content-Length: 10737418240
+Bytes recebidos: 10737418240 (10.00 GiB) em 21 s
+Igual ao arquivo original: sim

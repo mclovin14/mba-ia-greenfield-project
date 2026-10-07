@@ -1,0 +1,47 @@
+# 2026-10-07T16:21:05.648Z  POST /videos/Q34hT1nOgiQ/upload/complete
+HTTP 202
+{
+  "public_id": "Q34hT1nOgiQ",
+  "title": "Evidência — vídeo de 10 GiB",
+  "description": null,
+  "status": "processing",
+  "original_filename": "video-10gib.mp4",
+  "mime_type": "video/mp4",
+  "size_bytes": 10737418240,
+  "duration_seconds": null,
+  "width": null,
+  "height": null,
+  "video_codec": null,
+  "audio_codec": null,
+  "container_format": null,
+  "processing_error": null,
+  "thumbnail_url": null,
+  "created_at": "2026-10-07T16:20:04.317Z",
+  "updated_at": "2026-10-07T16:21:05.216Z"
+}
+
+# Banco logo após o complete
+  public_id  |   status   | size_bytes  | upload_id 
+-------------+------------+-------------+-----------
+ Q34hT1nOgiQ | processing | 10737418240 | 
+(1 row)
+
+
+# Job na fila BullMQ (Redis): bull:video-processing:video-f098a19c-9d5f-483c-b892-dfb76b5331ac
+data
+{"videoId":"f098a19c-9d5f-483c-b892-dfb76b5331ac"}
+ats
+1
+priority
+0
+name
+process-video
+timestamp
+1791390065220
+processedOn
+1791390065222
+opts
+{"removeOnFail":{"age":86400},"jobId":"video-f098a19c-9d5f-483c-b892-dfb76b5331ac","removeOnComplete":{"age":3600,"count":1000},"backoff":{"delay":1000,"type":"exponential"},"attempts":3}
+delay
+0
+

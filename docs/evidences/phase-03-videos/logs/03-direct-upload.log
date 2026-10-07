@@ -1,0 +1,23 @@
+# 2026-10-07T16:21:05.198Z  Upload multipart direto ao storage (640 partes de 16777216 bytes, 4 em paralelo)
+# As URLs são presignadas e apontam para o MinIO; os bytes do vídeo não passam pela API.
+Exemplo de URL de parte: http://localhost:9000/videos/f098a19c-9d5f-483c-b892-dfb76b5331ac/original?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=streamtube%2F20261007%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261007T162006Z&X-Amz-Expires=3600&X-Amz-Signature=…&X-Amz-SignedHeaders=host&partNumber=1&uploadId=YzIzYjEwY2EtOGQwMS00MDljLWJlMGQtY2VlOWVmNTFkZTBjLjM1NTc0NTBmLTMyY2EtNDA1Ny1iZjRiLTRmYjNkZDE0ODZhMngxNzkxMzkwMDA0MzI1NTUxMTM4&x-id=UploadPart
+
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 1..100 -> 200
+  PUT direto no MinIO: 100/640 partes  1.56 GiB  5 s
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 101..200 -> 200
+  PUT direto no MinIO: 200/640 partes  3.13 GiB  12 s
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 201..300 -> 200
+  PUT direto no MinIO: 300/640 partes  4.69 GiB  21 s
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 301..400 -> 200
+  PUT direto no MinIO: 400/640 partes  6.25 GiB  33 s
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 401..500 -> 200
+  PUT direto no MinIO: 500/640 partes  7.81 GiB  42 s
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 501..600 -> 200
+  PUT direto no MinIO: 600/640 partes  9.38 GiB  51 s
+POST /videos/Q34hT1nOgiQ/upload/part-urls  partes 601..640 -> 200
+  PUT direto no MinIO: 640/640 partes  10.00 GiB  56 s
+
+Total: 10.00 GiB em 58 s (175 MiB/s)
+
+GET /videos/Q34hT1nOgiQ/upload/parts -> 200
+  partes armazenadas: 640   soma: 10737418240 bytes

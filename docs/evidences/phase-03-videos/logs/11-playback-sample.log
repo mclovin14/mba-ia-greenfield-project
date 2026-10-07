@@ -1,0 +1,16 @@
+# 2026-10-07T16:24:11.991Z  Vídeo de taxa normal para a reprodução no navegador (sample-60s-720p.mp4, 20607921 bytes, gerado com o FFmpeg do worker)
+POST /videos -> 201 (2 partes)
+PUT direto no MinIO -> 200
+POST /videos/pKJzpghG_Sw/upload/complete -> 202
+2026-10-07T16:24:10.950Z  status = processing (resposta do complete)
+2026-10-07T16:24:10.956Z  status = processing
+2026-10-07T16:24:11.973Z  status = ready
+
+  public_id  | status | duration_seconds | width | height | video_codec | audio_codec |                   thumbnail_key                    
+-------------+--------+------------------+-------+--------+-------------+-------------+----------------------------------------------------
+ pKJzpghG_Sw | ready  |               60 |  1280 |    720 | h264        | aac         | 6dd1306c-f32c-4ce9-bff7-30001a650452/thumbnail.jpg
+(1 row)
+
+
+GET /videos/pKJzpghG_Sw/stream -> 200  (expires_at 2026-10-07T22:24:11.924Z)
+Thumbnail -> HTTP 200 (assets/thumbnail-sample.jpg)

@@ -1,0 +1,43 @@
+# 2026-10-07T16:21:33.120Z  Arquivo que não é vídeo (6 MiB de bytes 0x41) enviado como video/mp4
+POST /videos -> 201 (status uploading)
+PUT parte 1 no MinIO -> 200
+POST /videos/wfASSxRONFY/upload/complete -> 202
+2026-10-07T16:21:32.106Z  status = processing (resposta do complete)
+2026-10-07T16:21:32.109Z  status = processing
+2026-10-07T16:21:33.117Z  status = failed
+
+# GET /videos/wfASSxRONFY
+{
+  "public_id": "wfASSxRONFY",
+  "title": "Evidência — arquivo inválido",
+  "description": null,
+  "status": "failed",
+  "original_filename": "corrompido.mp4",
+  "mime_type": "video/mp4",
+  "size_bytes": 6291456,
+  "duration_seconds": null,
+  "width": null,
+  "height": null,
+  "video_codec": null,
+  "audio_codec": null,
+  "container_format": null,
+  "processing_error": "NO_VIDEO_STREAM",
+  "thumbnail_url": null,
+  "created_at": "2026-10-07T16:21:31.965Z",
+  "updated_at": "2026-10-07T16:21:32.484Z"
+}
+
+# GET /videos/wfASSxRONFY/stream em vídeo com falha -> HTTP 409
+{
+  "statusCode": 409,
+  "error": "VIDEO_NOT_READY",
+  "message": "The video is not ready for playback"
+}
+
+# Banco
+  public_id  | status | processing_error | thumbnail_key 
+-------------+--------+------------------+---------------
+ wfASSxRONFY | failed | NO_VIDEO_STREAM  | 
+(1 row)
+
+

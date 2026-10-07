@@ -1,0 +1,36 @@
+# 2026-10-07T16:18:03Z  docker compose ps (nestjs-project)
+SERVICE        IMAGE                                                                                              STATUS                   PORTS
+db             postgres:17                                                                                        Up 9 minutes (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+mailpit        axllent/mailpit                                                                                    Up 9 minutes (healthy)   0.0.0.0:1025->1025/tcp, [::]:1025->1025/tcp, 0.0.0.0:8025->8025/tcp, [::]:8025->8025/tcp, 1110/tcp
+minio          cgr.dev/chainguard/minio@sha256:4cf4831a2bbcf13ddca09c1cbcc9faff716dd3c4247e0babc32864b8ee8e0034   Up 9 minutes (healthy)   0.0.0.0:9000-9001->9000-9001/tcp, [::]:9000-9001->9000-9001/tcp
+nestjs-api     nestjs-project-nestjs-api                                                                          Up 9 minutes             0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+redis          redis:8.4-alpine                                                                                   Up 9 minutes (healthy)   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+video-worker   nestjs-project-video-worker                                                                        Up 9 minutes             
+
+# Worker de vídeo consumindo a fila (processo dentro do container video-worker)
+     18 sh -c node -r ts-node/register -r tsconfig-paths/register src/worker.ts
+     19 node -r ts-node/register -r tsconfig-paths/register src/worker.ts
+
+# FFmpeg/ffprobe disponíveis no worker
+ffprobe version 5.1.9-0+deb12u1 Copyright (c) 2007-2026 the FFmpeg developers
+ffmpeg version 5.1.9-0+deb12u1 Copyright (c) 2000-2026 the FFmpeg developers
+
+# Redis com a política exigida pelo BullMQ
+maxmemory-policy
+noeviction
+
+# Buckets no MinIO (bootstrap do StorageModule)
+e2e-thumbnails
+e2e-videos
+it-cors-thumbnails
+it-cors-videos
+it-processing-thumbnails
+it-processing-videos
+it-processor-thumbnails
+it-processor-videos
+it-storage-thumbnails
+it-storage-videos
+it-upload-thumbnails
+it-upload-videos
+thumbnails
+videos
