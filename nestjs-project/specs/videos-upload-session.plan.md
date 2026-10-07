@@ -31,7 +31,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #1
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/:publicId/upload/part-urls com `{ "part_numbers": [2, 1] }`
@@ -44,7 +44,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/:publicId/upload/part-urls com `{ "part_numbers": [3] }` (`part_count = 2`)
@@ -54,7 +54,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/:publicId/upload/part-urls com `{ "part_numbers": [1, 1] }`
@@ -70,7 +70,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #2
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/:publicId/upload/part-urls com `{ "part_numbers": [1] }`
@@ -89,7 +89,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. DELETE /videos/:publicId/upload
@@ -109,7 +109,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Com o token do não dono: POST part-urls (`{ "part_numbers": [1] }`), GET parts e DELETE upload no `publicId` do dono
@@ -122,7 +122,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. POST /videos/abc/upload/part-urls, GET /videos/abc/upload/parts e DELETE /videos/abc/upload com o token do dono
@@ -132,7 +132,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #6
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Mover o rascunho para `processing` direto no banco (`UPDATE videos SET status = 'processing', upload_id = NULL`)
@@ -144,7 +144,7 @@ Não dono e `publicId` inexistente recebem o mesmo `404 VIDEO_NOT_FOUND`. Um ví
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. As três rotas sem header `Authorization`

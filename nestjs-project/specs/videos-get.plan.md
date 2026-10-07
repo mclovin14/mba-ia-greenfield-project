@@ -29,7 +29,7 @@ target_file: test/videos-get.e2e-spec.ts
 
 **Covers AC:** #1
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Semear o estado `ready`; GET /videos/:publicId com o token do dono
@@ -44,7 +44,7 @@ target_file: test/videos-get.e2e-spec.ts
 
 **Covers AC:** #2
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Sem semear estado final (o vídeo está `processing`), GET /videos/:publicId
@@ -54,7 +54,7 @@ target_file: test/videos-get.e2e-spec.ts
 
 **Covers AC:** #3
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. Semear o estado `failed`; GET /videos/:publicId
@@ -68,7 +68,7 @@ target_file: test/videos-get.e2e-spec.ts
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /videos/:publicId do dono com o token do não dono
@@ -80,7 +80,7 @@ target_file: test/videos-get.e2e-spec.ts
 
 **Covers AC:** #4
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /videos/abc com o token do dono
@@ -90,7 +90,7 @@ target_file: test/videos-get.e2e-spec.ts
 
 **Covers AC:** #5
 **Source:** auto
-**Last sync:** 2026-10-05T20:24:00Z
+**Last sync:** 2026-10-07T15:32:23Z
 
 **Steps:**
   1. GET /videos/:publicId sem header `Authorization`

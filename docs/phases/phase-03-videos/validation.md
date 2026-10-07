@@ -4,8 +4,8 @@ name: phase-03-videos
 status: clean
 issue_count: 0
 sources_mtime:
-  docs/phases/phase-03-videos/context.md: "2026-10-05T11:56:07-03:00"
-  docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-05T11:54:31-03:00"
+  docs/phases/phase-03-videos/context.md: "2026-10-07T12:30:03-03:00"
+  docs/decisions/technical-decisions-phase-03-videos.md: "2026-10-07T12:27:36-03:00"
 issues:
   - id: IC-1
     status: resolved
@@ -120,7 +120,7 @@ advisories: []
 
 # phase-03-videos — Validation
 
-_Round 3 — clean. Round 1 raised 23 issues and round 2 raised 4 (ICC-1, AMB-7, AMB-8, DG-3, which came from interactions between the newly decided TDs and inherited context). All 27 are resolved; see `## Resolved Issues`. Re-running every check over the post-resolve context.md surfaced no new findings._
+_Round 4 — clean. Round 1 raised 23 issues and round 2 raised 4 (ICC-1, AMB-7, AMB-8, DG-3, which came from interactions between the newly decided TDs and inherited context). All 27 are resolved; see `## Resolved Issues`. Round 3 re-ran every check over the post-resolve context.md and found nothing new. Round 4 re-ran them after the 2026-10-07 revision of `phase-03-videos/TD-11` (storage keys persisted on the `videos` row) and also found nothing new._
 
 ## Findings
 
