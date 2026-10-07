@@ -79,7 +79,7 @@ npm test                                 # Unit + integration tests (*.spec.ts a
 npm run test:integration                 # Integration tests only
 npm run test:watch                       # Watch mode
 npm run test:cov                         # Coverage report
-npm run test:e2e                         # End-to-end tests (always with --runInBand)
+npm run test:e2e                         # End-to-end tests (serial: maxWorkers 1 in the config)
 npm run fixtures:large                   # Generate the 10 GiB video fixture (.large-fixtures/, git-ignored)
 npm run test:large                       # Opt-in 10 GiB upload suite (*.large-spec.ts); needs fixtures:large first
 
@@ -104,14 +104,14 @@ curl http://localhost:3000
 
 ### Test execution
 
-Integration and e2e suites share a single test database. They **must** be run with `--runInBand`:
+Integration and e2e suites share a single test database, Redis and MinIO, so they **must** run serially. Both Jest configs pin `maxWorkers: 1` (the unit + integration config also sets `testTimeout: 30000`), so the plain commands are already serial on any machine:
 
 ```bash
-docker compose exec nestjs-api npm test -- --runInBand
-docker compose exec nestjs-api npm run test:e2e   # already configured
+docker compose exec nestjs-api npm test
+docker compose exec nestjs-api npm run test:e2e
 ```
 
-Parallel execution causes FK violations, deadlocks, and cross-suite contamination because suites truncate or seed shared tables concurrently.
+Never override it with `--maxWorkers` > 1: parallel execution causes FK violations, deadlocks, and cross-suite contamination because suites truncate or seed shared tables and empty shared buckets concurrently.
 
 During active development, run only the tests related to the file being changed (`npm test -- path/to/file.spec.ts`). Before declaring a task done, run the full suite — see the global `CLAUDE.md` → "Definition of Done (Technical)".
 
