@@ -174,3 +174,12 @@
   - `VideosService.createDraft` passou a gerar o uuid (`randomUUID`) antes do insert, para gravar `original_key` na mesma escrita. `markReady` recebe e grava `thumbnail_key`. Upload, worker e playback leem as colunas; `video-object-keys.ts` continua sendo o único lugar que monta as chaves.
   - `.mcp.json` ganhou o servidor `context7` (`@upstash/context7-mcp` 4.2.0). As bibliotecas da fase foram reconferidas por ele (ver *Context7 cross-check* em `library-refs.md`); nenhuma divergência de API. Divergências de versão sinalizadas: o context7 indexa `bullmq` v6.3.11 (projeto em 5.x) e `typeorm` 0.3.27 (projeto em 0.3.28).
   - A tabela *Decisions Summary* do documento de TDs ainda mostrava `_[pending]_` na coluna Choice, embora as 14 TDs estivessem decididas. Ela foi preenchida a partir das linhas `**Decision:**`.
+
+## Correção pós-entrega — suíte serial por configuração (2026-10-07)
+
+- **Status:** done
+- **Branch:** `bugfix/test-serial-run`
+- **Observations:**
+  - `npm test` era `jest` puro, e o Jest usa CPUs−1 workers. Numa máquina com vários núcleos as suítes de integração rodavam em paralelo sobre o mesmo Postgres, Redis e MinIO. Com `--maxWorkers=4` foram 18 testes vermelhos em 7 suítes (limpeza de tabelas e de bucket concorrente).
+  - A config do Jest em `package.json` e `test/jest-e2e.json` agora fixa `maxWorkers: 1`. A config de unit + integração também fixa `testTimeout: 30000`, contra o estouro do timeout padrão de 5 s em hooks sob carga. `npm test` e `npm run test:e2e` são seriais em qualquer máquina, sem flags.
+  - Verificado sem flags: unit + integração 341/341 e e2e 96/96; `tsc` 0; lint 0.
