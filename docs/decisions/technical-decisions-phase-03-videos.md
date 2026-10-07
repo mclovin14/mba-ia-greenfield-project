@@ -341,6 +341,8 @@ _Subprojects in scope:_
 
 **Decision:** B (Two buckets keyed by videoId)
 
+**Follow-up (2026-10-07):** the layout is unchanged, but the keys are now also persisted on the row (`videos.original_key`, set on creation; `videos.thumbnail_key`, set when processing succeeds — migration `AddVideoStorageKeys1791382169844`), so the persistence model records the storage keys of the file and the thumbnail as the assignment requires. `src/videos/video-object-keys.ts` remains the only place that builds them.
+
 ---
 
 ## TD-12: S3 Client Library
@@ -429,17 +431,17 @@ _Subprojects in scope:_
 
 | ID | Scope | Decision | Recommendation | Choice |
 |----|-------|----------|---------------|--------|
-| TD-01 | Backend | Background Job Queue Technology | BullMQ + Redis (`@nestjs/bullmq@^11`) | _[pending]_ |
-| TD-02 | Backend | Large File Upload Protocol | Presigned S3 multipart, direct to storage | _[pending]_ |
-| TD-03 | Backend | Draft Pre-registration and Processing Trigger | API-driven initiate/complete + idempotent enqueue | _[pending]_ |
-| TD-04 | Backend | Video Worker Runtime and Topology | Same codebase, separate entrypoint + `video-worker` service | _[pending]_ |
-| TD-05 | Backend | FFmpeg Integration | `spawn` system ffprobe/ffmpeg on presigned URL | _[pending]_ |
-| TD-06 | Backend | Unique Public Video Identifier | Random base64url `public_id` + unique index | _[pending]_ |
-| TD-07 | Backend | Streaming and Download Delivery | Presigned GET + Range/206 from storage | _[pending]_ |
-| TD-08 | Backend | Video Status Lifecycle Model | Processing-only status, Postgres enum | _[pending]_ |
-| TD-09 | Backend | Processing Failure and Retry Policy | Bounded retries + `failed` with reason | _[pending]_ |
-| TD-10 | Backend | Access Policy for Streaming/Download | Owner-only, centralized policy | _[pending]_ |
-| TD-11 | Backend | Storage Bucket and Object Key Layout | Two buckets keyed by video id | _[pending]_ |
-| TD-12 | Backend | S3 Client Library | AWS SDK v3 | _[pending]_ |
-| TD-13 | Backend | Local S3-compatible Storage Image | Chainguard MinIO pinned by digest | _[pending]_ |
-| TD-14 | Backend | Test Strategy for Storage and Queue | Real MinIO + Redis in integration/e2e | _[pending]_ |
+| TD-01 | Backend | Background Job Queue Technology | BullMQ + Redis (`@nestjs/bullmq@^11`) | **A** |
+| TD-02 | Backend | Large File Upload Protocol | Presigned S3 multipart, direct to storage | **A** |
+| TD-03 | Backend | Draft Pre-registration and Processing Trigger | API-driven initiate/complete + idempotent enqueue | **A** |
+| TD-04 | Backend | Video Worker Runtime and Topology | Same codebase, separate entrypoint + `video-worker` service | **A** |
+| TD-05 | Backend | FFmpeg Integration | `spawn` system ffprobe/ffmpeg on presigned URL | **A** |
+| TD-06 | Backend | Unique Public Video Identifier | Random base64url `public_id` + unique index | **B** |
+| TD-07 | Backend | Streaming and Download Delivery | Presigned GET + Range/206 from storage | **A** |
+| TD-08 | Backend | Video Status Lifecycle Model | Processing-only status, Postgres enum | **A** |
+| TD-09 | Backend | Processing Failure and Retry Policy | Bounded retries + `failed` with reason | **A** |
+| TD-10 | Backend | Access Policy for Streaming/Download | Owner-only, centralized policy | **A** |
+| TD-11 | Backend | Storage Bucket and Object Key Layout | Two buckets keyed by video id | **B** |
+| TD-12 | Backend | S3 Client Library | AWS SDK v3 | **A** |
+| TD-13 | Backend | Local S3-compatible Storage Image | Chainguard MinIO pinned by digest | **A** |
+| TD-14 | Backend | Test Strategy for Storage and Queue | Real MinIO + Redis in integration/e2e | **A** |

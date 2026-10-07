@@ -74,6 +74,18 @@ describe('VideosService (integration)', () => {
       expect(stored.public_id).toMatch(PUBLIC_ID_PATTERN);
       expect(stored.channel_id).toBe(channel.id);
     });
+
+    it('should persist the storage key of the original and no thumbnail key', async () => {
+      const { channel } = await createOwner();
+
+      const { id } = await draftFor(channel);
+
+      const stored = await dataSource
+        .getRepository(Video)
+        .findOneByOrFail({ id });
+      expect(stored.original_key).toBe(`${id}/original`);
+      expect(stored.thumbnail_key).toBeNull();
+    });
   });
 
   describe('findOwnedByPublicId', () => {

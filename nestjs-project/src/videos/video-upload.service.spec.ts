@@ -33,6 +33,8 @@ const uploadingVideo = (overrides: Partial<Video> = {}): Video =>
     status: VideoStatus.Uploading,
     size_bytes: 20 * MiB,
     upload_id: 'upload-id',
+    original_key: 'video-uuid/original',
+    thumbnail_key: null,
     created_at: new Date(),
     updated_at: new Date(),
     ...overrides,
@@ -87,6 +89,7 @@ describe('VideoUploadService', () => {
             original_filename: input.originalFilename,
             mime_type: input.mimeType,
             size_bytes: input.sizeBytes,
+            original_key: 'video-uuid/original',
             created_at: new Date(),
             updated_at: new Date(),
           }),
@@ -138,7 +141,7 @@ describe('VideoUploadService', () => {
     expect(videosService.setUploadId).not.toHaveBeenCalled();
   });
 
-  it('should open the multipart upload on {id}/original and persist its id', async () => {
+  it('should open the multipart upload on the persisted original_key and persist its id', async () => {
     await service.initiate(USER_ID, buildDto());
 
     expect(storageService.createMultipartUpload).toHaveBeenCalledWith(

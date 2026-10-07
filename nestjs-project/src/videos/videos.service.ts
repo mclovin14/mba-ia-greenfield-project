@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -5,6 +6,7 @@ import { isPgUniqueViolationOnColumn } from '../common/database/pg-errors';
 import { Video, VideoStatus } from './entities/video.entity';
 import { generatePublicId } from './public-id';
 import { VideoAccessPolicy } from './video-access.policy';
+import { videoOriginalKey } from './video-object-keys';
 import {
   PUBLIC_ID_COLUMN,
   PUBLIC_ID_MAX_ATTEMPTS,
@@ -32,6 +34,7 @@ export type VideoStatusPatch = { status: VideoStatus } & Partial<
     | 'video_codec'
     | 'audio_codec'
     | 'container_format'
+    | 'thumbnail_key'
   >
 >;
 
@@ -62,7 +65,12 @@ export class VideosService {
    */
   async createDraft(input: CreateVideoDraftInput): Promise<Video> {
     for (let attempt = 1; attempt <= PUBLIC_ID_MAX_ATTEMPTS; attempt++) {
+      // The id is generated here so the original's storage key is persisted
+      // with the row instead of being filled in by a second write.
+      const id = randomUUID();
       const video = this.videoRepository.create({
+        id,
+        original_key: videoOriginalKey(id),
         public_id: generatePublicId(),
         channel_id: input.channelId,
         title: input.title,
@@ -114,10 +122,15 @@ export class VideosService {
   }
 
   /** processing → ready; false when the row already left processing. */
-  async markReady(id: string, metadata: VideoMetadata): Promise<boolean> {
+  async markReady(
+    id: string,
+    metadata: VideoMetadata,
+    thumbnailKey: string,
+  ): Promise<boolean> {
     return this.transitionStatus(id, VideoStatus.Processing, {
       status: VideoStatus.Ready,
       ...metadata,
+      thumbnail_key: thumbnailKey,
       processing_error: null,
     });
   }

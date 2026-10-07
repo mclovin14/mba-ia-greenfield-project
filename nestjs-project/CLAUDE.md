@@ -192,7 +192,7 @@ NestJS with standard module structure. Source lives in `src/`, compiled output i
 - `media/` — `MediaModule`: `FfmpegService` runs `ffprobe` (metadata) and `ffmpeg` (one JPEG frame, max width 640) with timeouts and output caps.
 - `channels/` — `ChannelsService.findByUserId` resolves the uploader's channel (`CHANNEL_NOT_FOUND`, 404).
 
-Storage object keys (`videos/video-object-keys.ts`): original at `{videoId}/original` in the videos bucket, thumbnail at `{videoId}/thumbnail.jpg` in the thumbnails bucket. Schema: migration `src/database/migrations/1791237941900-CreateVideos.ts`.
+Storage object keys (`videos/video-object-keys.ts`): original at `{videoId}/original` in the videos bucket, thumbnail at `{videoId}/thumbnail.jpg` in the thumbnails bucket. They are persisted on the row (`original_key`, set on creation; `thumbnail_key`, set on `processing → ready`) and read from there — build new keys only through the helpers. Schema: migrations `src/database/migrations/1791237941900-CreateVideos.ts` and `1791382169844-AddVideoStorageKeys.ts`.
 
 ### Video lifecycle
 
