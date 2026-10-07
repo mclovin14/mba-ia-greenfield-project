@@ -188,3 +188,13 @@
   - `npm test` era `jest` puro, e o Jest usa CPUs−1 workers. Numa máquina com vários núcleos as suítes de integração rodavam em paralelo sobre o mesmo Postgres, Redis e MinIO. Com `--maxWorkers=4` foram 18 testes vermelhos em 7 suítes (limpeza de tabelas e de bucket concorrente).
   - A config do Jest em `package.json` e `test/jest-e2e.json` agora fixa `maxWorkers: 1`. A config de unit + integração também fixa `testTimeout: 30000`, contra o estouro do timeout padrão de 5 s em hooks sob carga. `npm test` e `npm run test:e2e` são seriais em qualquer máquina, sem flags.
   - Verificado sem flags: unit + integração 341/341 e e2e 96/96; `tsc` 0; lint 0.
+
+## Correção pós-entrega — diagnóstico do EPERM em `node_modules/.bin` (2026-10-07)
+
+- **Status:** done
+- **Branch:** `docs/rancher-mount-diagnosis`
+- **Observations:**
+  - A hipótese registrada no SI-03.1 (permissão TCC do macOS sobre `~/Documents`) foi refutada: com Acesso Total ao Disco concedido ao Rancher Desktop e a VM reiniciada, `readlink` em `node_modules/.bin/*` continuou falhando com `Operation not permitted`.
+  - Causa real: a VM do Rancher Desktop rodava com emulação `qemu` e montava `/Users` via `reverse-sshfs` (`fuse.sshfs`), que não resolve symlinks. Confirmado com `rdctl shell mount` e `rdctl list-settings`.
+  - Correção: emulação **VZ** e mount type **virtiofs** nas preferências do Rancher Desktop. Com `/Users` montado como `virtiofs`, os scripts rodaram direto pelo npm, sem o contorno via `node`: `npx tsc --noEmit` 0, `npm run lint` 0, `npm test` 53 suítes / 341 testes, `npm run test:e2e` 9 suítes / 96 testes.
+  - `nestjs-project/CLAUDE.md` passou a registrar a causa e a correção; o contorno via `node` ficou como alternativa.

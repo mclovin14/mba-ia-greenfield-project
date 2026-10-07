@@ -91,7 +91,7 @@ npm run lint                             # ESLint with auto-fix
 npm run format                           # Prettier formatting
 ```
 
-If a script fails with `sh: 1: <bin>: Operation not permitted` (binaries under `node_modules/.bin` not executable through the bind mount), call the package entry point with `node` instead, e.g. `node node_modules/jest/bin/jest.js --runInBand`, `node node_modules/@nestjs/cli/bin/nest.js build`, `node node_modules/typescript/bin/tsc --noEmit`. `start:prod`, `start:worker` and `start:worker:prod` already call `node` and are not affected.
+If a script fails with `sh: 1: <bin>: Operation not permitted`, the bind mount cannot resolve the symlinks under `node_modules/.bin`. This happens on Rancher Desktop with QEMU emulation, whose `reverse-sshfs` mount (`fuse.sshfs`) fails `readlink`; it is not a macOS permission issue. The fix is in Rancher Desktop → Preferences → Virtual Machine: Emulation **VZ** and Volumes → Mount Type **virtiofs**, then recreate the stack. Until then, call the package entry point with `node` instead, e.g. `node node_modules/jest/bin/jest.js --runInBand`, `node node_modules/@nestjs/cli/bin/nest.js build`, `node node_modules/typescript/bin/tsc --noEmit`. `start:prod`, `start:worker` and `start:worker:prod` already call `node` and are not affected.
 
 ### Host-only commands (Docker / connectivity probes)
 
