@@ -8,6 +8,7 @@ import queueConfig from '../config/queue.config';
 import storageConfig from '../config/storage.config';
 import { QueueModule } from '../queue/queue.module';
 import { createTestDataSource } from '../test/create-test-data-source';
+import { waitForVideoProcessingQueue } from '../test/queues';
 import { User } from '../users/entities/user.entity';
 import { Video } from './entities/video.entity';
 import { VideoUploadService } from './video-upload.service';
@@ -30,6 +31,7 @@ describe('VideosModule', () => {
     }).compile();
 
     expect(module.get(VideoUploadService)).toBeInstanceOf(VideoUploadService);
+    await waitForVideoProcessingQueue(module);
     await module.close();
   }, 30000);
 });

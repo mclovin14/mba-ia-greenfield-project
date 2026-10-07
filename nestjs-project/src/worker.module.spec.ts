@@ -2,6 +2,7 @@ import { ModulesContainer } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { WorkerModule } from './worker.module';
+import { waitForVideoProcessingQueue } from './test/queues';
 
 describe('WorkerModule', () => {
   it('should compile with the real root modules and register no controllers', async () => {
@@ -14,6 +15,7 @@ describe('WorkerModule', () => {
     );
     expect(controllers).toEqual([]);
     expect(module.get(DataSource)).toBeInstanceOf(DataSource);
+    await waitForVideoProcessingQueue(module);
     await module.close();
   });
 });

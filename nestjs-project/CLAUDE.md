@@ -14,6 +14,7 @@ Then verify each infrastructure service is actually ready to accept connections 
 
 - **PostgreSQL:** `docker compose exec db pg_isready -U streamtube` — expect `accepting connections`
 - **Redis / MinIO:** `docker compose ps redis minio` — both must show `healthy` (each has a Compose healthcheck)
+- **Video worker:** `docker compose logs video-worker` — expect `Video worker started (queue: video-processing)`
 
 Only start the NestJS dev server (`npm run start:dev`) when the user **explicitly** asks to run the application — never as part of "start the environment".
 
@@ -38,7 +39,7 @@ Services:
 - `mailpit` — SMTP capture for confirmation / password-reset emails, SMTP port `1025`, web UI and API port `8025`
 - `redis` — Redis 8.4 (BullMQ queue backend), port `6379`, `maxmemory-policy noeviction`
 - `minio` — MinIO (S3-compatible object storage), API port `9000`, console port `9001`. CORS origin for browser uploads comes from `STORAGE_CORS_ALLOWED_ORIGINS` (default `http://localhost:3001`). Buckets are created by the app on boot (`StorageBootstrapService`), not by Compose
-- `video-worker` — same image as `nestjs-api` (with `ffmpeg`/`ffprobe`); consumes the `video-processing` queue. Idle by default, like `nestjs-api`; start it with `docker compose exec video-worker npm run start:worker`. The worker has no watch mode (`nest start --watch` would wipe the API's `dist/` via `deleteOutDir`), so **restart it after every code change**. Compiled build: `npm run build`, then `npm run start:worker:prod` (`node dist/worker`). It opens no HTTP port and exits with code 0 on `SIGTERM` after closing the queue workers and the DB connection.
+- `video-worker` — same image as `nestjs-api` (with `ffmpeg`/`ffprobe`); consumes the `video-processing` queue. Unlike `nestjs-api`, it **starts automatically** with `docker compose up` (`command: npm run start:worker`, `restart: unless-stopped`), so processing runs after every upload without manual steps; it keeps restarting until `node_modules` exists. The worker has no watch mode (`nest start --watch` would wipe the API's `dist/` via `deleteOutDir`), so **restart it after every code change**: `docker compose restart video-worker`. Compiled build: `npm run build`, then `npm run start:worker:prod` (`node dist/worker`). It opens no HTTP port and exits with code 0 on `SIGTERM` after closing the queue workers and the DB connection.
 
 **Storage endpoints — documented exception to the service-name rule (AMB-7):** `S3_ENDPOINT=http://minio:9000` is used for all service-to-service traffic. `S3_PUBLIC_ENDPOINT=http://localhost:9000` is the host the **browser** sees, used only to sign presigned URLs returned to clients; that is why it is `localhost`. Never use `S3_PUBLIC_ENDPOINT` for traffic between containers.
 
@@ -71,7 +72,7 @@ docker compose down
 npm run start:dev                        # Dev server with hot-reload
 npm run build                            # Compile to dist/ (dist/main.js and dist/worker.js)
 npm run start:prod                       # Run compiled API (node dist/main)
-npm run start:worker                     # Video worker from source (ts-node) — run in the video-worker container
+npm run start:worker                     # Video worker from source (ts-node) — the video-worker container's command
 npm run start:worker:prod                # Compiled video worker (node dist/worker)
 
 npm test                                 # Unit + integration tests (*.spec.ts and *.integration-spec.ts)
@@ -90,7 +91,7 @@ npm run lint                             # ESLint with auto-fix
 npm run format                           # Prettier formatting
 ```
 
-If a script fails with `sh: 1: <bin>: Operation not permitted` (binaries under `node_modules/.bin` not executable through the bind mount), call the package entry point with `node` instead, e.g. `node node_modules/jest/bin/jest.js --runInBand`, `node node_modules/@nestjs/cli/bin/nest.js build`, `node node_modules/typescript/bin/tsc --noEmit`. `start:prod` and `start:worker:prod` already call `node` and are not affected.
+If a script fails with `sh: 1: <bin>: Operation not permitted` (binaries under `node_modules/.bin` not executable through the bind mount), call the package entry point with `node` instead, e.g. `node node_modules/jest/bin/jest.js --runInBand`, `node node_modules/@nestjs/cli/bin/nest.js build`, `node node_modules/typescript/bin/tsc --noEmit`. `start:prod`, `start:worker` and `start:worker:prod` already call `node` and are not affected.
 
 ### Host-only commands (Docker / connectivity probes)
 

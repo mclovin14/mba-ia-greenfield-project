@@ -21,6 +21,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    # Consumes the video-processing queue as soon as the stack is up. Restarts
+    # until node_modules exist (first `npm install`) and after a crash.
+    command: ["npm", "run", "start:worker"]
+    restart: unless-stopped
     volumes:
       - .:/home/node/app
     depends_on:

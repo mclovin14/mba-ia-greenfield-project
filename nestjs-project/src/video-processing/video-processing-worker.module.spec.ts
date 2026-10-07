@@ -2,6 +2,7 @@ import { MODULE_METADATA } from '@nestjs/common/constants';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../app.module';
 import { WorkerModule } from '../worker.module';
+import { waitForVideoProcessingQueue } from '../test/queues';
 import { VideoProcessingWorkerModule } from './video-processing-worker.module';
 import { VideoProcessingProcessor } from './video-processing.processor';
 import { VideoProcessingService } from './video-processing.service';
@@ -53,6 +54,7 @@ describe('VideoProcessingWorkerModule', () => {
     expect(module.get(VideoProcessingService)).toBeInstanceOf(
       VideoProcessingService,
     );
+    await waitForVideoProcessingQueue(module);
     await module.close();
   });
 
