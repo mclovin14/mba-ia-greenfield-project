@@ -164,3 +164,13 @@
   - **Fixture ausente:** a suíte falha nos 2 testes com a mensagem que aponta para `npm run fixtures:large`. Verificado renomeando o arquivo temporariamente.
   - **Isolamento da suíte:** `test/jest-large.json` usa `testRegex \.large-spec\.ts$` e `testTimeout 3600000`. A suíte não é listada pelas configs de `npm test` nem de `test:e2e` (`--listTests`).
   - **EPERM nos scripts:** `npm run test:large` passa pelo `.bin/jest`, que tem o mesmo EPERM dos outros binários, então a suíte foi rodada com `node node_modules/jest/bin/jest.js --config ./test/jest-large.json --runInBand`. Já `npm run fixtures:large` funciona, porque chama `bash`.
+
+### Correção pós-entrega — chaves de storage persistidas e context7 (2026-10-07)
+- **Status:** completed
+- **Motivação:** o enunciado pede que a persistência do vídeo registre, no mínimo, as chaves de storage do arquivo e do thumbnail. Até aqui elas eram apenas derivadas do id (TD-11). Além disso, o `.mcp.json` não tinha o context7.
+- **Tests:** unit + integration 53 suites / 341 testes (+3: `original_key` obrigatório na entity, `createDraft` persiste `original_key` e deixa `thumbnail_key` nulo, `original_key` acompanha o id de cada tentativa). A spec de migrations agora reverte `AddVideoStorageKeys` e verifica o backfill de linhas existentes. e2e 9 suites / 96 testes; `tsc --noEmit` 0; lint 0.
+- **Observations:**
+  - Migration `1791382169844-AddVideoStorageKeys` gerada pela CLI. Removida a recriação espúria de `videos_status_enum` que a CLI emitiu (o enum não mudou), e adicionado à mão o backfill (`{id}/original` para todas as linhas; `{id}/thumbnail.jpg` para as `ready`) antes do `SET NOT NULL`, porque a CLI não expressa migração de dados.
+  - `VideosService.createDraft` passou a gerar o uuid (`randomUUID`) antes do insert, para gravar `original_key` na mesma escrita. `markReady` recebe e grava `thumbnail_key`. Upload, worker e playback leem as colunas; `video-object-keys.ts` continua sendo o único lugar que monta as chaves.
+  - `.mcp.json` ganhou o servidor `context7` (`@upstash/context7-mcp` 4.2.0). As bibliotecas da fase foram reconferidas por ele (ver *Context7 cross-check* em `library-refs.md`); nenhuma divergência de API. Divergências de versão sinalizadas: o context7 indexa `bullmq` v6.3.11 (projeto em 5.x) e `typeorm` 0.3.27 (projeto em 0.3.28).
+  - A tabela *Decisions Summary* do documento de TDs ainda mostrava `_[pending]_` na coluna Choice, embora as 14 TDs estivessem decididas. Ela foi preenchida a partir das linhas `**Decision:**`.
